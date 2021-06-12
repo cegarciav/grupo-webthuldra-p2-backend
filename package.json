@@ -47,10 +47,13 @@
     "bcrypt": "^5.0.1",
     "core-js": "^3.6.5",
     "dotenv": "^10.0.0",
+    "jsonapi-serializer": "^3.6.7",
+    "jsonwebtoken": "^8.5.1",
     "koa": "^2.13.0",
     "koa-body": "^4.2.0",
     "koa-ejs": "^4.3.0",
     "koa-flash-message": "^0.1.6",
+    "koa-jwt": "^4.0.1",
     "koa-logger": "^3.2.1",
     "koa-override-method": "^1.0.0",
     "koa-router": "^9.4.0",
@@ -64,7 +67,8 @@
     "react-dom": "^16.13.1",
     "react-hot-loader": "^4.12.21",
     "sequelize": "^6.3.5",
-    "sequelize-cli": "^6.2.0"
+    "sequelize-cli": "^6.2.0",
+    "uuidv4": "^6.2.10"
   },
   "engines": {
     "node": "10.x || 12.x",
