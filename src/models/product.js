@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.belongsTo(models.store);
-      this.belongsToMany(models.deal, { through: models.purchase, as: 'purchase' });
+      this.belongsToMany(models.deal, { through: models.purchase });
     }
   }
 
