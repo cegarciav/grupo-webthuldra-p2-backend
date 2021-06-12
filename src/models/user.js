@@ -17,6 +17,10 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.deal);
       this.hasMany(models.store);
     }
+
+    async checkPassword(password) {
+      return bcrypt.compare(password, this.password);
+    }
   }
 
   user.init({
