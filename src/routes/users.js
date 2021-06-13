@@ -1,30 +1,13 @@
 const KoaRouter = require('koa-router');
-const { uuid } = require('uuidv4');
 const { Serializer } = require('jsonapi-serializer');
+const { uuid } = require('uuidv4');
+const jwtKoa = require('koa-jwt');
+const { setCurrentUser } = require('../middlewares/auth');
 
 const router = new KoaRouter();
 const userSerializer = new Serializer('users', {
   attributes: ['firstName', 'lastName', 'email'],
   keyForAttributes: 'camelCase',
-});
-
-router.param('id', async (id, ctx, next) => {
-  ctx.state.user = await ctx.orm.user.findByPk(id);
-  if (!ctx.state.user) ctx.throw(404, `User with id ${id} could not be found`);
-  return next();
-});
-
-router.get('users.list', '/', async (ctx) => {
-  const users = await ctx.orm.user.findAll();
-  ctx.body = userSerializer.serialize(users);
-});
-
-router.get('users.me', '/me', async (ctx) => {
-  ctx.body = userSerializer.serialize(ctx.state.currentUser);
-});
-
-router.get('users.show', '/:id', async (ctx) => {
-  ctx.body = userSerializer.serialize(ctx.state.user);
 });
 
 router.post('users.create', '/', async (ctx) => {
@@ -44,6 +27,28 @@ router.post('users.create', '/', async (ctx) => {
       ctx.throw(500);
     }
   }
+});
+
+router.use(jwtKoa({ secret: process.env.JWT_SECRET, key: 'authData' }));
+router.use(setCurrentUser);
+
+router.param('id', async (id, ctx, next) => {
+  ctx.state.user = await ctx.orm.user.findByPk(id);
+  if (!ctx.state.user) ctx.throw(404, `User with id ${id} could not be found`);
+  return next();
+});
+
+router.get('users.list', '/', async (ctx) => {
+  const users = await ctx.orm.user.findAll();
+  ctx.body = userSerializer.serialize(users);
+});
+
+router.get('users.me', '/me', async (ctx) => {
+  ctx.body = userSerializer.serialize(ctx.state.currentUser);
+});
+
+router.get('users.show', '/:id', async (ctx) => {
+  ctx.body = userSerializer.serialize(ctx.state.user);
 });
 
 router.patch('users.update', '/:id', async (ctx) => {
