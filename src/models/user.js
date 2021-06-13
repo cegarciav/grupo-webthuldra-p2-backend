@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.hasMany(models.deal);
-      this.hasMany(models.store);
+      this.hasMany(models.store, { foreignKey: 'ownerId' });
     }
 
     async checkPassword(password) {
