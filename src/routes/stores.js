@@ -67,8 +67,10 @@ router.patch('stores.update', '/:id', async (ctx) => {
     if (['SequelizeAssociationError', 'SequelizeUniqueConstraintError'].includes(e.name)) {
       ctx.state.errors = e.errors;
       ctx.throw(400);
+    } else if (e.status) {
+      ctx.throw(e);
     } else {
-      ctx.throw(500);
+      ctx.throw(505);
     }
   }
 });
