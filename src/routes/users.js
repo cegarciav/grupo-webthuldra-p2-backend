@@ -11,7 +11,7 @@ const userSerializer = new Serializer('users', {
 });
 const dealSerializer = new Serializer('deals', {
   attributes: ['status', 'customerId'],
-  keyForAttributes: 'camelCase',
+  keyForAttribute: 'camelCase',
 });
 
 router.post('users.create', '/', async (ctx) => {
