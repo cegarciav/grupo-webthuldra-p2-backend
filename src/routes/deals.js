@@ -5,7 +5,7 @@ const { uuid } = require('uuidv4');
 const router = new KoaRouter();
 const dealSerializer = new Serializer('deals', {
   attributes: ['status', 'customerId'],
-  keyForAttributes: 'camelCase',
+  keyForAttribute: 'camelCase',
 });
 
 async function getStore(ctx, next) {
