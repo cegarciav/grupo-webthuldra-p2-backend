@@ -45,4 +45,38 @@ router.post('deals.create', '/', getStore, async (ctx) => {
   }
 });
 
+router.param('id', async (id, ctx, next) => {
+  ctx.state.deal = await ctx.orm.deal.findByPk(id);
+  if (!ctx.state.deal) ctx.throw(404, `Deal with id ${id} could not be found`);
+  return next();
+});
+
+router.patch('deals.update', '/:id', getStore, async (ctx) => {
+  const { currentUser, store, deal } = ctx.state;
+  try {
+    if (store.ownerId !== currentUser.id) {
+      ctx.throw(403, `You are not allowed to modify deal with id ${currentUser.id}`);
+    } else {
+      const modifications = {
+        ...ctx.request.body,
+      };
+      await ctx.orm.deal.update(modifications, {
+        where: { id: deal.id },
+        individualHooks: true,
+      });
+      const updatedDeal = await ctx.orm.deal.findByPk(deal.id);
+      ctx.body = dealSerializer.serialize(updatedDeal);
+    }
+  } catch (e) {
+    if (['SequelizeAssociationError', 'SequelizeUniqueConstraintError'].includes(e.name)) {
+      ctx.state.errors = e.errors;
+      ctx.throw(400);
+    } else if (e.status) {
+      ctx.throw(e);
+    } else {
+      ctx.throw(500);
+    }
+  }
+});
+
 module.exports = router;
