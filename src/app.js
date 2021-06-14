@@ -7,6 +7,8 @@ const koaStatic = require('koa-static');
 const render = require('koa-ejs');
 const session = require('koa-session');
 const override = require('koa-override-method');
+const { koaSwagger } = require('koa2-swagger-ui');
+const apiDoc = require('../swagger.json');
 const assets = require('./assets');
 const mailer = require('./mailers');
 const routes = require('./routes');
@@ -27,6 +29,16 @@ app.keys = [
 
 // expose ORM through context's prototype
 app.context.orm = orm;
+
+// Swagger docs
+app.use(
+  koaSwagger({
+    routePrefix: '/api-docs',
+    swaggerOptions: {
+      spec: apiDoc,
+    },
+  }),
+);
 
 /**
  * Middlewares
