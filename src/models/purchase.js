@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
 
   purchase.init({
     dealId: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID,
       allowNull: false,
       validate: {
         notEmpty: true,
@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     productId: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID,
       allowNull: false,
       validate: {
         notEmpty: true,
