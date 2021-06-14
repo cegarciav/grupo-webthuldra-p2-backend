@@ -1,8 +1,6 @@
 const KoaRouter = require('koa-router');
 const { Serializer } = require('jsonapi-serializer');
 const { uuid } = require('uuidv4');
-const jwtKoa = require('koa-jwt');
-const { setCurrentUser } = require('../middlewares/auth');
 
 const router = new KoaRouter();
 const productSerializer = new Serializer('products', {
@@ -42,9 +40,6 @@ router.post('products.create', '/', getStore, async (ctx) => {
     }
   }
 });
-
-router.use(jwtKoa({ secret: process.env.JWT_SECRET, key: 'authData' }));
-router.use(setCurrentUser);
 
 router.param('id', async (id, ctx, next) => {
   ctx.state.product = await ctx.orm.product.findByPk(id);
