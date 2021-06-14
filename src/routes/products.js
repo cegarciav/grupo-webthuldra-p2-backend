@@ -57,4 +57,8 @@ router.get('products.list', '/', async (ctx) => {
   ctx.body = productSerializer.serialize(products);
 });
 
+router.get('products.show', '/:id', async (ctx) => {
+  ctx.body = productSerializer.serialize(ctx.state.product);
+});
+
 module.exports = router;
