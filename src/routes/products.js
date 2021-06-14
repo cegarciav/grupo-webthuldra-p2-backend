@@ -53,7 +53,7 @@ router.param('id', async (id, ctx, next) => {
 });
 
 router.get('products.list', '/', async (ctx) => {
-  const products = await ctx.orm.products.findAll();
+  const products = await ctx.orm.product.findAll();
   ctx.body = productSerializer.serialize(products);
 });
 
