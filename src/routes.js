@@ -7,6 +7,7 @@ const users = require('./routes/users');
 const stores = require('./routes/stores');
 const auth = require('./routes/auth');
 const products = require('./routes/products');
+const deals = require('./routes/deals');
 
 const router = new KoaRouter({ prefix: '/api' });
 
@@ -69,5 +70,6 @@ router.use(setCurrentUser);
 /* Protected routes */
 router.use('/stores', stores.routes());
 router.use('/stores/:storeId/products', products.routes());
+router.use('/stores/:storeId/deals', deals.routes());
 
 module.exports = router;
