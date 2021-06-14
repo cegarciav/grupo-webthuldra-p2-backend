@@ -20,7 +20,7 @@ router.post('users.create', '/', async (ctx) => {
     ctx.status = 201;
     ctx.body = userSerializer.serialize(user);
   } catch (e) {
-    if (['SequelizeAssociationError', 'SequelizeUniqueConstraintError'].includes(e.name)) {
+    if (e.name && e.name.includes('Sequelize')) {
       ctx.state.errors = e.errors;
       ctx.throw(400);
     } else {
@@ -74,7 +74,7 @@ router.patch('users.update', '/:id', async (ctx) => {
       ctx.body = userSerializer.serialize(updatedUser);
     }
   } catch (e) {
-    if (['SequelizeAssociationError', 'SequelizeUniqueConstraintError'].includes(e.name)) {
+    if (e.name && e.name.includes('Sequelize')) {
       ctx.state.errors = e.errors;
       ctx.throw(400);
     } else {
