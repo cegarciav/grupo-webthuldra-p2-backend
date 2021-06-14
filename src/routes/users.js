@@ -9,6 +9,10 @@ const userSerializer = new Serializer('users', {
   attributes: ['firstName', 'lastName', 'email'],
   keyForAttributes: 'camelCase',
 });
+const dealSerializer = new Serializer('deals', {
+  attributes: ['status', 'customerId'],
+  keyForAttributes: 'camelCase',
+});
 
 router.post('users.create', '/', async (ctx) => {
   try {
@@ -45,6 +49,16 @@ router.get('users.list', '/', async (ctx) => {
 
 router.get('users.me', '/me', async (ctx) => {
   ctx.body = userSerializer.serialize(ctx.state.currentUser);
+});
+
+router.get('users.me.deals', '/me/deals', async (ctx) => {
+  const { currentUser } = ctx.state;
+  const deals = await ctx.orm.deal.findAll({
+    where: {
+      customerId: currentUser.id,
+    },
+  });
+  ctx.body = dealSerializer.serialize(deals);
 });
 
 router.get('users.show', '/:id', async (ctx) => {
