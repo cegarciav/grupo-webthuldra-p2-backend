@@ -35,7 +35,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
     },
     ownerId: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID,
       allowNull: false,
       validate: {
         notEmpty: true,

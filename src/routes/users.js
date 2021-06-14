@@ -7,7 +7,7 @@ const { setCurrentUser } = require('../middlewares/auth');
 const router = new KoaRouter();
 const userSerializer = new Serializer('users', {
   attributes: ['firstName', 'lastName', 'email'],
-  keyForAttributes: 'camelCase',
+  keyForAttribute: 'camelCase',
 });
 
 router.post('users.create', '/', async (ctx) => {

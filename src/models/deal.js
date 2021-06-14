@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     customerId: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID,
       allowNull: false,
       validate: {
         notEmpty: true,

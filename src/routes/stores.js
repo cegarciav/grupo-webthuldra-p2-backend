@@ -5,7 +5,7 @@ const { uuid } = require('uuidv4');
 const router = new KoaRouter();
 const storeSerializer = new Serializer('stores', {
   attributes: ['address', 'name', 'description', 'ownerId'],
-  keyForAttributes: 'camelCase',
+  keyForAttribute: 'camelCase',
 });
 
 router.post('stores.create', '/', async (ctx) => {
