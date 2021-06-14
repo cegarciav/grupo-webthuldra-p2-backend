@@ -80,7 +80,7 @@ router.patch('users.update', '/:id', async (ctx) => {
     } else if (e.status) {
       ctx.throw(e);
     } else {
-      ctx.throw(505);
+      ctx.throw(500);
     }
   }
 });

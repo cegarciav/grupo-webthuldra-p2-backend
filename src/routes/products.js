@@ -36,7 +36,7 @@ router.post('products.create', '/', getStore, async (ctx) => {
     } else if (e.status) {
       ctx.throw(e);
     } else {
-      ctx.throw(505);
+      ctx.throw(500);
     }
   }
 });
@@ -47,8 +47,13 @@ router.param('id', async (id, ctx, next) => {
   return next();
 });
 
-router.get('products.list', '/', async (ctx) => {
-  const products = await ctx.orm.product.findAll();
+router.get('products.list', '/', getStore, async (ctx) => {
+  const { store } = ctx.state;
+  const products = await ctx.orm.product.findAll({
+    where: {
+      storeId: store.id,
+    },
+  });
   ctx.body = productSerializer.serialize(products);
 });
 
