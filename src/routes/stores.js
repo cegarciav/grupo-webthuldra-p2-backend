@@ -1,8 +1,6 @@
 const KoaRouter = require('koa-router');
 const { Serializer } = require('jsonapi-serializer');
 const { uuid } = require('uuidv4');
-const jwtKoa = require('koa-jwt');
-const { setCurrentUser } = require('../middlewares/auth');
 
 const router = new KoaRouter();
 const storeSerializer = new Serializer('stores', {
@@ -28,9 +26,6 @@ router.post('stores.create', '/', async (ctx) => {
     }
   }
 });
-
-router.use(jwtKoa({ secret: process.env.JWT_SECRET, key: 'authData' }));
-router.use(setCurrentUser);
 
 router.param('id', async (id, ctx, next) => {
   ctx.state.store = await ctx.orm.store.findByPk(id);
@@ -67,6 +62,8 @@ router.patch('stores.update', '/:id', async (ctx) => {
     if (['SequelizeAssociationError', 'SequelizeUniqueConstraintError'].includes(e.name)) {
       ctx.state.errors = e.errors;
       ctx.throw(400);
+    } else if (e.status) {
+      ctx.throw(e);
     } else {
       ctx.throw(500);
     }

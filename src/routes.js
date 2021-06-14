@@ -6,6 +6,7 @@ const index = require('./routes/index');
 const users = require('./routes/users');
 const stores = require('./routes/stores');
 const auth = require('./routes/auth');
+const products = require('./routes/products');
 
 const router = new KoaRouter({ prefix: '/api' });
 
@@ -62,10 +63,11 @@ router.use(async (ctx, next) => {
 router.use('/', index.routes());
 router.use('/auth', auth.routes());
 router.use('/users', users.routes());
-router.use('/stores', stores.routes());
 router.use(jwtKoa({ secret: process.env.JWT_SECRET, key: 'authData' }));
 router.use(setCurrentUser);
 
 /* Protected routes */
+router.use('/stores', stores.routes());
+router.use('/stores/:storeId/products', products.routes());
 
 module.exports = router;
