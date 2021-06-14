@@ -1,0 +1,307 @@
+const { uuid } = require('uuidv4');
+const supertest = require('supertest');
+const app = require('../app');
+
+const request = supertest(app.callback());
+
+describe('Users routes', () => {
+  let auth;
+  let loggedInUser;
+  let loggedOutUser;
+  const userFields = {
+    id: uuid(),
+    firstName: 'Test',
+    lastName: 'User',
+    email: 'test@user.cl',
+    password: 'testPassword',
+  };
+  const user2Fields = {
+    id: uuid(),
+    firstName: 'Test',
+    lastName: 'User',
+    email: 'test2@user.cl',
+    password: 'testPassword',
+  };
+
+  beforeAll(async () => {
+    await app.context.orm.sequelize.sync({ force: true });
+    loggedInUser = await app.context.orm.user.create(userFields);
+    loggedOutUser = await app.context.orm.user.create(user2Fields);
+    const authResponse = await request
+      .post('/api/auth')
+      .set('Content-type', 'application/json')
+      .send({ email: userFields.email, password: userFields.password });
+    auth = authResponse.body;
+  });
+
+  afterAll(async () => {
+    await app.context.orm.sequelize.close();
+  });
+
+  describe('POST /api/users', () => {
+    describe('Successful creation of user', () => {
+      let createResponse;
+      const userData = {
+        firstName: 'Test Create',
+        lastName: 'User',
+        email: 'test_create@user.cl',
+        password: 'testPassword',
+      };
+      beforeAll(async () => {
+        createResponse = await request
+          .post('/api/users')
+          .set('Content-type', 'application/json')
+          .send(userData);
+      });
+      test('responds with 201 status code', async () => {
+        expect(createResponse.status).toBe(201);
+      });
+      test('responds with a json body type', async () => {
+        expect(createResponse.type).toEqual('application/json');
+      });
+      test('responds body has correct user email', async () => {
+        expect(createResponse.body.data.attributes.email).toEqual(userData.email);
+      });
+      test('responds body does not contain the password', async () => {
+        expect(createResponse.body.data.attributes.password).toEqual(undefined);
+      });
+      test('resource is available in database', async () => {
+        const newUser = await app.context.orm.user.findByPk(
+          createResponse.body.data.id,
+        );
+        expect(createResponse.body.data.id).toEqual(newUser.id);
+      });
+    });
+
+    describe('Failing creation of user', () => {
+      test('email already in use', async () => {
+        const userData = {
+          firstName: 'Test Create',
+          lastName: 'User',
+          email: 'test@user.cl',
+          password: 'testPassword',
+        };
+        const createResponse = await request
+          .post('/api/users')
+          .set('Content-type', 'application/json')
+          .send(userData);
+        expect(createResponse.status).toBe(400);
+        expect(createResponse.body.errors.length).toBe(1);
+        expect(createResponse.body.errors[0].message).toBe('email must be unique');
+      });
+      test('firstName must be sent', async () => {
+        const userData = {
+          lastName: 'User',
+          email: 'new_email@user.cl',
+          password: 'testPassword',
+        };
+        const createResponse = await request
+          .post('/api/users')
+          .set('Content-type', 'application/json')
+          .send(userData);
+        expect(createResponse.status).toBe(400);
+        expect(createResponse.body.errors.length).toBe(1);
+        expect(createResponse.body.errors[0].message).toBe('user.firstName cannot be null');
+      });
+    });
+  });
+
+  describe('GET /api/users', () => {
+    const authorizedGetUser = () => request
+      .get('/api/users')
+      .auth(auth.accessToken, { type: 'bearer' });
+    const unauthorizedGetUser = () => request.get('/api/users');
+
+    describe('when a user is logged-in, a list of users is retrieved', () => {
+      let response;
+      beforeAll(async () => {
+        response = await authorizedGetUser(loggedInUser.id);
+      });
+      test('responds with 200 status code', async () => {
+        expect(response.status).toBe(200);
+      });
+      test('responds with a json body type', async () => {
+        expect(response.type).toEqual('application/json');
+      });
+      test('response contains at least the logged-in user', async () => {
+        const filteredData = response.body.data.filter((user) => user.id === loggedInUser.id);
+        expect(filteredData.length).toEqual(1);
+      });
+    });
+
+    describe('when a user is not logged-in, a 401 error is sent by the server', () => {
+      test('unauthorized get request to endpoint', async () => {
+        const response = await unauthorizedGetUser(loggedOutUser.id);
+        expect(response.status).toBe(401);
+      });
+    });
+  });
+
+  describe('GET /api/users/me', () => {
+    const authorizedGetUser = () => request
+      .get('/api/users/me')
+      .auth(auth.accessToken, { type: 'bearer' });
+    const unauthorizedGetUser = () => request.get('/api/users/me');
+
+    describe('only a logged-in user can retrive its information', () => {
+      let response;
+      beforeAll(async () => {
+        response = await authorizedGetUser(loggedInUser.id);
+      });
+      test('responds with 200 status code', async () => {
+        expect(response.status).toBe(200);
+      });
+      test('responds with a json body type', async () => {
+        expect(response.type).toEqual('application/json');
+      });
+      test('responds body has correct user id', async () => {
+        expect(response.body.data.id).toEqual(loggedInUser.id);
+      });
+      test('responds body has correct user email', async () => {
+        expect(response.body.data.attributes.email).toEqual(loggedInUser.email);
+      });
+      test('responds body does not contain the password', async () => {
+        expect(response.body.data.attributes.password).toEqual(undefined);
+      });
+    });
+
+    describe('when request is unauthorized because user is not logged in', () => {
+      test('unauthorized get request to endpoint', async () => {
+        const response = await unauthorizedGetUser(loggedOutUser.id);
+        expect(response.status).toBe(401);
+      });
+    });
+  });
+
+  describe('GET /api/users/:id', () => {
+    const authorizedGetUser = (id) => request
+      .get(`/api/users/${id}`)
+      .auth(auth.accessToken, { type: 'bearer' });
+    const unauthorizedGetUser = (id) => request.get(`/api/users/${id}`);
+
+    describe('when passed, id corresponds to an existing user', () => {
+      let response;
+      beforeAll(async () => {
+        response = await authorizedGetUser(loggedOutUser.id);
+      });
+      test('responds with 200 status code', async () => {
+        expect(response.status).toBe(200);
+      });
+      test('responds with a json body type', async () => {
+        expect(response.type).toEqual('application/json');
+      });
+      test('responds body has correct user id', async () => {
+        expect(response.body.data.id).toEqual(loggedOutUser.id);
+      });
+      test('responds body has correct user email', async () => {
+        expect(response.body.data.attributes.email).toEqual(loggedOutUser.email);
+      });
+      test('responds body does not contain the password', async () => {
+        expect(response.body.data.attributes.password).toEqual(undefined);
+      });
+    });
+
+    describe('when passed, id does not correspond to any user', () => {
+      test('responds with 404 status code', async () => {
+        const response = await authorizedGetUser(uuid());
+        expect(response.status).toBe(404);
+      });
+    });
+
+    describe('when request is unauthorized because user is not logged in', () => {
+      test('unauthorized get request to endpoint', async () => {
+        const response = await unauthorizedGetUser(loggedOutUser.id);
+        expect(response.status).toBe(401);
+      });
+    });
+  });
+
+  describe('PATCH /api/users/:id', () => {
+    describe('a user can modify their info. They always need to send their password to modify it', () => {
+      test('a user can modify their name', async () => {
+        const updateResponse = await request
+          .patch(`/api/users/${loggedInUser.id}`)
+          .auth(auth.accessToken, { type: 'bearer' })
+          .send({
+            password: loggedInUser.password,
+            firstName: 'Nuevo firstName',
+          });
+        expect(updateResponse.status).toBe(200);
+        expect(updateResponse.body.data.attributes.firstName).toBe('Nuevo firstName');
+        expect(updateResponse.body.data.attributes.email).toBe(loggedInUser.email);
+        const updatedUser = await app.context.orm.user.findByPk(loggedInUser.id);
+        expect(updatedUser.firstName).toBe('Nuevo firstName');
+        expect(updatedUser.email).toBe(loggedInUser.email);
+        loggedInUser = updatedUser;
+      });
+      test('a user can modify their password sending newPassword attribute', async () => {
+        const updateResponse = await request
+          .patch(`/api/users/${loggedInUser.id}`)
+          .auth(auth.accessToken, { type: 'bearer' })
+          .send({
+            password: loggedInUser.password,
+            newPassword: 'totallynewpassword',
+          });
+        expect(updateResponse.status).toBe(200);
+        expect(updateResponse.body.data.attributes.firstName).toBe(loggedInUser.firstName);
+        expect(updateResponse.body.data.attributes.email).toBe(loggedInUser.email);
+        const updatedUser = await app.context.orm.user.findByPk(loggedInUser.id);
+        const isPasswordOk = await updatedUser.checkPassword('totallynewpassword');
+        expect(isPasswordOk).toBe(true);
+        expect(updatedUser.email).toBe(loggedInUser.email);
+        loggedInUser = updatedUser;
+      });
+      test('a user firstName cannot be empty', async () => {
+        const updateResponse = await request
+          .patch(`/api/users/${loggedInUser.id}`)
+          .auth(auth.accessToken, { type: 'bearer' })
+          .send({
+            password: loggedInUser.password,
+            firstName: '',
+          });
+        expect(updateResponse.status).toBe(400);
+        expect(updateResponse.body.errors.length).toBe(1);
+        expect(updateResponse.body.errors[0].message).toBe('Validation notEmpty on firstName failed');
+      });
+    });
+
+    describe('a user cannot modify another user', () => {
+      let updateResponse;
+      beforeAll(async () => {
+        updateResponse = await request
+          .patch(`/api/users/${loggedOutUser.id}`)
+          .auth(auth.accessToken, { type: 'bearer' })
+          .send({
+            password: loggedOutUser.password,
+            firstName: 'Nuevo firstName',
+          });
+      });
+      test('responds with 403 status code', async () => {
+        expect(updateResponse.status).toBe(403);
+      });
+      test('responds with a json body type', async () => {
+        expect(updateResponse.type).toEqual('application/json');
+      });
+      test('message describing the error must match', async () => {
+        expect(updateResponse.body.errors[0].message).toEqual(
+          `You are not allowed to modify user with id ${loggedOutUser.id}`,
+        );
+      });
+      test('responds body has correct user email', async () => {
+        expect(updateResponse.body.errors[0].type).toEqual('Forbidden');
+      });
+    });
+
+    describe('when request is unauthorized because user is not logged in', () => {
+      test('users cannot modify their profile if their are logged-out', async () => {
+        const updateResponse = await request
+          .patch(`/api/users/${loggedInUser.id}`)
+          .send({
+            password: loggedInUser.password,
+            firstName: 'Steve',
+          });
+        expect(updateResponse.status).toBe(401);
+      });
+    });
+  });
+});

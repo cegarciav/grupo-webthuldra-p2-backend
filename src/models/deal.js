@@ -17,6 +17,11 @@ module.exports = (sequelize, DataTypes) => {
   }
 
   deal.init({
+    id: {
+      allowNull: false,
+      primaryKey: true,
+      type: DataTypes.UUID,
+    },
     status: {
       type: DataTypes.STRING,
       validate: {
@@ -25,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     customerId: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID,
       allowNull: false,
       validate: {
         notEmpty: true,

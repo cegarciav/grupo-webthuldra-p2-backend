@@ -17,6 +17,11 @@ module.exports = (sequelize, DataTypes) => {
   }
 
   product.init({
+    id: {
+      allowNull: false,
+      primaryKey: true,
+      type: DataTypes.UUID,
+    },
     name: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -42,7 +47,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
     },
     storeId: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID,
       allowNull: false,
       validate: {
         notEmpty: true,
