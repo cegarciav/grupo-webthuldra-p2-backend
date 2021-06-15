@@ -72,7 +72,7 @@ router.get('users.me.deals', '/me/deals', async (ctx) => {
       },
     ],
   });
-  ctx.body = deals; // dealSerializer.serialize(deals);
+  ctx.body = deals;
 });
 
 router.get('users.show', '/:id', async (ctx) => {
