@@ -1,18 +1,9 @@
 const KoaRouter = require('koa-router');
-const { Serializer } = require('jsonapi-serializer');
 const { uuid } = require('uuidv4');
 const jwtKoa = require('koa-jwt');
 const { setCurrentUser } = require('../middlewares/auth');
 
 const router = new KoaRouter();
-const userSerializer = new Serializer('users', {
-  attributes: ['firstName', 'lastName', 'email'],
-  keyForAttribute: 'camelCase',
-});
-const dealSerializer = new Serializer('deals', {
-  attributes: ['status', 'customerId'],
-  keyForAttribute: 'camelCase',
-});
 
 router.post('users.create', '/', async (ctx) => {
   try {
@@ -22,7 +13,12 @@ router.post('users.create', '/', async (ctx) => {
     });
     await user.save();
     ctx.status = 201;
-    ctx.body = userSerializer.serialize(user);
+    ctx.body = {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      id: user.id,
+    };
   } catch (e) {
     if (e.name && e.name.includes('Sequelize')) {
       ctx.state.errors = e.errors;
@@ -43,12 +39,20 @@ router.param('id', async (id, ctx, next) => {
 });
 
 router.get('users.list', '/', async (ctx) => {
-  const users = await ctx.orm.user.findAll();
-  ctx.body = userSerializer.serialize(users);
+  const users = await ctx.orm.user.findAll({
+    attributes: ['firstName', 'lastName', 'email', 'id'],
+  });
+  ctx.body = users;
 });
 
 router.get('users.me', '/me', async (ctx) => {
-  ctx.body = userSerializer.serialize(ctx.state.currentUser);
+  const { currentUser } = ctx.state;
+  ctx.body = {
+    firstName: currentUser.firstName,
+    lastName: currentUser.lastName,
+    email: currentUser.email,
+    id: currentUser.id,
+  };
 });
 
 router.get('users.me.deals', '/me/deals', async (ctx) => {
@@ -57,12 +61,28 @@ router.get('users.me.deals', '/me/deals', async (ctx) => {
     where: {
       customerId: currentUser.id,
     },
+    include: [
+      {
+        association: 'customer',
+        attributes: ['firstName', 'lastName', 'email', 'id'],
+      },
+      {
+        association: 'products',
+        attributes: ['name', 'price', 'unit'],
+      },
+    ],
   });
-  ctx.body = dealSerializer.serialize(deals);
+  ctx.body = deals; // dealSerializer.serialize(deals);
 });
 
 router.get('users.show', '/:id', async (ctx) => {
-  ctx.body = userSerializer.serialize(ctx.state.user);
+  const { user } = ctx.state;
+  ctx.body = {
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    id: user.id,
+  };
 });
 
 router.patch('users.update', '/:id', async (ctx) => {
@@ -84,8 +104,10 @@ router.patch('users.update', '/:id', async (ctx) => {
         where: { id: user.id },
         individualHooks: true,
       });
-      const updatedUser = await ctx.orm.user.findByPk(user.id);
-      ctx.body = userSerializer.serialize(updatedUser);
+      const updatedUser = await ctx.orm.user.findByPk(user.id, {
+        attributes: ['firstName', 'lastName', 'email', 'id'],
+      });
+      ctx.body = updatedUser;
     }
   } catch (e) {
     if (e.name && e.name.includes('Sequelize')) {
