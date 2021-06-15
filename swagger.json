@@ -212,6 +212,46 @@
         }
       }
     },
+    "/users/me/deals": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "user"
+        ],
+        "summary": "Obtiene listado de deals de usuario",
+        "description": "El usuario, debe haber iniciado sesión previamente, recibe su información de usuario",
+        "operationId": "deals.list",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Obtención de datos de usuario exitoso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Acceso restringido. El usuario debe haber iniciado sesión",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/users/{userId}": {
       "get": {
         "security": [
@@ -490,7 +530,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Información de usuario obtenido exitosamente",
+            "description": "Información de la tienda obtenido exitosamente",
             "content": {
               "application/json": {
                 "schema": {
@@ -605,51 +645,29 @@
           }
         }
       }
-    }
-  },
-  "/stores/{storeId}/products": {
-    "post": {
-      "security": [
-        {
-          "Bearer": []
-        }
-      ],
-      "tags": [
-        "product"
-      ],
-      "summary": "Agrega un nuevo producto",
-      "description": "El dueño de una tienda puede agregar un producto",
-      "operationId": "products.create",
-      "consumes": [
-        "application/json"
-      ],
-      
-      "produces": [
-        "application/json"
-      ],
-      "requestBody": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Product"
-            }
+    },
+    "/stores/{storeId}/products": {
+      "post": {
+        "security": [
+          {
+            "Bearer": []
           }
-        }
-      },
-      "parameters": [
-        {
-          "name": "storeId",
-          "in": "path",
-          "description": "ID de la store a obtener",
-          "required":true,
-          "type": "string",
-          "format": "uuid"
-        }
-      ],
-      "responses": {
-        "201": {
-          "description": "Producto agregado exitosamente",
+        ],
+        "tags": [
+          "product"
+        ],
+        "summary": "Agrega un nuevo producto",
+        "description": "El dueño de una tienda puede agregar un producto",
+        "operationId": "products.create",
+        "consumes": [
+          "application/json"
+        ],
+        
+        "produces": [
+          "application/json"
+        ],
+        "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
@@ -658,12 +676,310 @@
             }
           }
         },
-        "400": {
-          "description": "Información para agregar un producto incorrecta",
+        "parameters": [
+          {
+            "name": "storeId",
+            "in": "path",
+            "description": "ID de la store a obtener",
+            "required":true,
+            "type": "string",
+            "format": "uuid"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Producto agregado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Información para agregar un producto incorrecta",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "product"
+        ],
+        "summary": "Obtiene la lista de productos en una tienda determinada",
+        "operationId": "products.list",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "storeId",
+            "in": "path",
+            "description": "ID de la store a obtener",
+            "required":true,
+            "type": "string",
+            "format": "uuid"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de productos obtenida exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Acceso restringido. El usuario debe haber iniciado sesión",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stores/{storeId}/products/{productId}": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "product"
+        ],
+        "summary": "Obtiene la información del producto con ID productId en la tienda con ID storeId",
+        "operationId": "products.show",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "storeId",
+            "in": "path",
+            "description": "ID de la store a obtener",
+            "required":true,
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "ID del producto a obtener",
+            "required":true,
+            "type": "string",
+            "format": "uuid"
+          }
+
+        ],
+        "responses": {
+          "200": {
+            "description": "Información de producto obtenido exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Producto no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Acceso restringido. El usuario debe haber iniciado sesión",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stores/{storeId}/deals": {
+      "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "deal"
+        ],
+        "summary": "Agrega un nuevo acuerdo de compra 'deal'",
+        "description": "Se puede agregar una promesa de compra ",
+        "operationId": "deals.create",
+        "consumes": [
+          "application/json"
+        ],
+        
+        "produces": [
+          "application/json"
+        ],
+        "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ApiErrorResponse"
+                "$ref": "#/components/schemas/Deal"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "storeId",
+            "in": "path",
+            "description": "ID de la store a obtener",
+            "required":true,
+            "type": "string",
+            "format": "uuid"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Deal agregado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Deal"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Información para agregar un deal incorrecta",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stores/{storeId}/deals/{dealId}": {
+      "patch": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "deal"
+        ],
+        "summary": "Modifica el estado de un acuerdo de compra",
+        "operationId": "deals.update",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "storeId",
+            "in": "path",
+            "description": "ID de la tienda a obtener",
+            "required":true,
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "name": "dealId",
+            "in": "path",
+            "description": "ID del deal a obtener",
+            "required":true,
+            "type": "string",
+            "format": "uuid"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "password"
+                ],
+                "properties": {
+                  "status": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Información actualizada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Deal"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Acceso restringido. El usuario debe haber iniciado sesión y mandar su contraseña actual en el body de la request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Un usuario no puede modificar la información de la tienda de< otro usuario",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
               }
             }
           }
@@ -808,6 +1124,33 @@
           },
           "storeId": {
             "type": "string"
+          }
+        }
+      },
+
+      "Deal": {
+        "type": "object",
+        "required": [
+          "products"
+        ],
+        "properties": {
+          "products": {
+            "type": "object"
+          }
+        }
+      },
+      "Purchase": {
+        "type": "object",
+        "required": [
+          "productId",
+          "amount"
+        ],
+        "properties": {
+          "productId": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "integer"
           }
         }
       },
