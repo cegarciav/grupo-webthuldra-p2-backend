@@ -4,8 +4,14 @@ const { uuid } = require('uuidv4');
 
 const router = new KoaRouter();
 const dealSerializer = new Serializer('deals', {
-  attributes: ['status', 'customerId'],
+  attributes: ['status'],
   keyForAttribute: 'camelCase',
+  products: {
+    ref: 'id',
+  },
+  customer: {
+    ref: 'id',
+  },
 });
 
 async function getStore(ctx, next) {
@@ -32,7 +38,17 @@ router.post('deals.create', '/', getStore, async (ctx) => {
       await purchase.save({ field: ['productId', 'amount', 'dealId'] });
     });
     ctx.status = 201;
-    ctx.body = dealSerializer.serialize(deal);
+    const completeDeal = await ctx.orm.deal.findByPk(deal.id, {
+      include: [
+        {
+          association: 'customer',
+        },
+        {
+          association: 'purchases',
+        },
+      ],
+    });
+    ctx.body = dealSerializer.serialize(completeDeal);
   } catch (e) {
     if (['SequelizeAssociationError', 'SequelizeUniqueConstraintError'].includes(e.name)) {
       ctx.state.errors = e.errors;
