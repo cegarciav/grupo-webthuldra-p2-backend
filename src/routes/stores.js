@@ -26,7 +26,12 @@ router.post('stores.create', '/', async (ctx) => {
 });
 
 router.param('id', async (id, ctx, next) => {
-  ctx.state.store = await ctx.orm.store.findByPk(id);
+  ctx.state.store = await ctx.orm.store.findByPk(id, {
+    include: {
+      association: 'owner',
+      attributes: ['firstName', 'lastName', 'email'],
+    },
+  });
   if (!ctx.state.store) ctx.throw(404, `Store with id ${id} could not be found`);
   return next();
 });
