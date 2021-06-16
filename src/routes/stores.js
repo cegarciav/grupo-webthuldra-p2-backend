@@ -1,24 +1,21 @@
 const KoaRouter = require('koa-router');
-const { Serializer } = require('jsonapi-serializer');
 const { uuid } = require('uuidv4');
 
 const router = new KoaRouter();
-const storeSerializer = new Serializer('stores', {
-  attributes: ['address', 'name', 'description', 'ownerId'],
-  keyForAttribute: 'camelCase',
-});
 
 router.post('stores.create', '/', async (ctx) => {
   try {
+    const { currentUser } = ctx.state;
     const store = ctx.orm.store.build({
       ...ctx.request.body,
+      ownerId: currentUser.id,
       id: uuid(),
     });
     await store.save({ field: ['id', 'address', 'name', 'description', 'ownerId'] });
     ctx.status = 201;
-    ctx.body = storeSerializer.serialize(store);
+    ctx.body = store;
   } catch (e) {
-    if (['SequelizeAssociationError', 'SequelizeUniqueConstraintError'].includes(e.name)) {
+    if (e.name && e.name.includes('Sequelize')) {
       ctx.state.errors = e.errors;
       ctx.throw(400);
     } else {
@@ -35,11 +32,11 @@ router.param('id', async (id, ctx, next) => {
 
 router.get('stores.list', '/', async (ctx) => {
   const stores = await ctx.orm.store.findAll();
-  ctx.body = storeSerializer.serialize(stores);
+  ctx.body = stores;
 });
 
 router.get('stores.show', '/:id', async (ctx) => {
-  ctx.body = storeSerializer.serialize(ctx.state.store);
+  ctx.body = ctx.state.store;
 });
 
 router.patch('stores.update', '/:id', async (ctx) => {
@@ -56,10 +53,10 @@ router.patch('stores.update', '/:id', async (ctx) => {
         individualHooks: true,
       });
       const updatedStore = await ctx.orm.store.findByPk(store.id);
-      ctx.body = storeSerializer.serialize(updatedStore);
+      ctx.body = updatedStore;
     }
   } catch (e) {
-    if (['SequelizeAssociationError', 'SequelizeUniqueConstraintError'].includes(e.name)) {
+    if (e.name && e.name.includes('Sequelize')) {
       ctx.state.errors = e.errors;
       ctx.throw(400);
     } else if (e.status) {
