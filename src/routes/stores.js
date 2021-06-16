@@ -1,4 +1,5 @@
 const KoaRouter = require('koa-router');
+const { Op } = require('sequelize');
 const { uuid } = require('uuidv4');
 
 const router = new KoaRouter();
@@ -31,8 +32,29 @@ router.param('id', async (id, ctx, next) => {
 });
 
 router.get('stores.list', '/', async (ctx) => {
-  const stores = await ctx.orm.store.findAll();
-  ctx.body = stores;
+  try {
+    const filters = {};
+    Object.keys(ctx.request.query)
+      .filter((param) => ctx.request.query[param] && param !== 'ownerId')
+      .forEach((param) => { filters[param] = { [Op.iLike]: `%${ctx.request.query[param]}%` }; });
+    if (ctx.request.query.ownerId) filters.ownerId = ctx.request.query.ownerId;
+
+    const stores = await ctx.orm.store.findAll({ where: filters });
+    ctx.body = stores;
+  } catch (e) {
+    if (e.name === 'SequelizeDatabaseError') {
+      ctx.state.errors = [{
+        message: 'ownerId must be a string with uuid format',
+        type: 'Wrong format',
+      }];
+      ctx.throw(400);
+    } else if (e.name && e.name.includes('Sequelize')) {
+      ctx.state.errors = e.errors;
+      ctx.throw(400);
+    } else {
+      ctx.throw(500);
+    }
+  }
 });
 
 router.get('stores.show', '/:id', async (ctx) => {
