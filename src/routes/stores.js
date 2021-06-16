@@ -40,7 +40,7 @@ router.get('stores.list', '/', async (ctx) => {
   try {
     const filters = {};
     Object.keys(ctx.request.query)
-      .filter((param) => ctx.request.query[param] && param !== 'ownerId')
+      .filter((param) => ['address', 'name', 'description'].includes(param) && ctx.request.query[param])
       .forEach((param) => { filters[param] = { [Op.iLike]: `%${ctx.request.query[param]}%` }; });
     if (ctx.request.query.ownerId) filters.ownerId = ctx.request.query.ownerId;
 
@@ -70,11 +70,13 @@ router.patch('stores.update', '/:id', async (ctx) => {
   const { currentUser, store } = ctx.state;
   try {
     if (store.ownerId !== currentUser.id) {
-      ctx.throw(403, `You are not allowed to modify user with id ${currentUser.id}`);
+      ctx.throw(403, `You are not allowed to modify store with id ${store.id}`);
     } else {
-      const modifications = {
-        ...ctx.request.body,
-      };
+      const modifications = {};
+      Object.keys(ctx.request.body)
+        .filter((param) => ['address', 'name', 'description'].includes(param) && ctx.request.body[param])
+        .forEach((param) => { modifications[param] = ctx.request.body[param]; });
+
       await ctx.orm.store.update(modifications, {
         where: { id: store.id },
         individualHooks: true,
