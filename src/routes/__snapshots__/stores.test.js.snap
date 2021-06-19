@@ -1,0 +1,89 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Stores routes GET /api/stores when a user is not logged-in, a 401 error is sent by the server response should match snapshot 1`] = `
+Object {
+  "errors": Array [
+    Object {
+      "message": "Authentication Error",
+      "type": "Unauthorised",
+    },
+  ],
+}
+`;
+
+exports[`Stores routes GET /api/stores/:id when passed, id does not correspond to any store response should match snapshot 1`] = `
+Object {
+  "errors": Array [
+    Object {
+      "message": "Store with id f8a40537-85da-41f6-a5cc-6bf691965333 could not be found",
+      "type": "Not Found",
+    },
+  ],
+}
+`;
+
+exports[`Stores routes GET /api/stores/:id when request is unauthorized because user is not logged-in response should match snapshot 1`] = `
+Object {
+  "errors": Array [
+    Object {
+      "message": "Authentication Error",
+      "type": "Unauthorised",
+    },
+  ],
+}
+`;
+
+exports[`Stores routes PATCH /api/stores/:id users cannot modify a store they do not own response should match snapshot 1`] = `
+Object {
+  "errors": Array [
+    Object {
+      "message": "You are not allowed to modify store with id 988006ed-f661-485d-bf3d-5cca0b11c1a1",
+      "type": "Forbidden",
+    },
+  ],
+}
+`;
+
+exports[`Stores routes PATCH /api/stores/:id users cannot modify their store if their are logged-out response should match snapshot 1`] = `
+Object {
+  "errors": Array [
+    Object {
+      "message": "Authentication Error",
+      "type": "Unauthorised",
+    },
+  ],
+}
+`;
+
+exports[`Stores routes POST /api/stores store address should be unique response should match snapshot 1`] = `
+Object {
+  "errors": Array [
+    Object {
+      "message": "address must be unique",
+      "type": "unique violation",
+    },
+  ],
+}
+`;
+
+exports[`Stores routes POST /api/stores store name should be unique response should match snapshot 1`] = `
+Object {
+  "errors": Array [
+    Object {
+      "message": "name must be unique",
+      "type": "unique violation",
+    },
+  ],
+}
+`;
+
+exports[`Stores routes POST /api/stores users cannot create stores if their are logged-out response should match snapshot 1`] = `
+Object {
+  "errors": Array [
+    Object {
+      "message": "Authentication Error",
+      "type": "Unauthorised",
+    },
+  ],
+}
+`;
