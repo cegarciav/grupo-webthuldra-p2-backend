@@ -5,7 +5,7 @@ const router = new KoaRouter();
 
 async function getStore(ctx, next) {
   ctx.state.store = await ctx.orm.store.findByPk(ctx.params.storeId);
-  if (!ctx.state.store) return ctx.throw(404);
+  if (!ctx.state.store) ctx.throw(404);
   return next();
 }
 
@@ -55,9 +55,11 @@ router.post('deals.create', '/', getStore, async (ctx) => {
       type: 'Wrong format',
     }];
     ctx.throw(400);
+    return;
   }
+  let transaction;
   try {
-    const transaction = await ctx.orm.sequelize.transaction();
+    transaction = await ctx.orm.sequelize.transaction();
     const deal = await ctx.orm.deal.create({
       id: newId,
       status: 'abierto',
@@ -80,6 +82,7 @@ router.post('deals.create', '/', getStore, async (ctx) => {
     });
     ctx.body = completeDeal;
   } catch (e) {
+    await transaction.rollback();
     if (e.name === 'SequelizeForeignKeyConstraintError') {
       ctx.state.errors = [{
         message: 'One of the products sent does not exist',
