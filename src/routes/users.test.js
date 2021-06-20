@@ -60,16 +60,16 @@ describe('Users routes', () => {
         expect(createResponse.type).toEqual('application/json');
       });
       test('responds body has correct user email', async () => {
-        expect(createResponse.body.data.attributes.email).toEqual(userData.email);
+        expect(createResponse.body.email).toEqual(userData.email);
       });
       test('responds body does not contain the password', async () => {
-        expect(createResponse.body.data.attributes.password).toEqual(undefined);
+        expect(createResponse.body.password).toEqual(undefined);
       });
       test('resource is available in database', async () => {
         const newUser = await app.context.orm.user.findByPk(
-          createResponse.body.data.id,
+          createResponse.body.id,
         );
-        expect(createResponse.body.data.id).toEqual(newUser.id);
+        expect(createResponse.body.id).toEqual(newUser.id);
       });
     });
 
@@ -124,7 +124,7 @@ describe('Users routes', () => {
         expect(response.type).toEqual('application/json');
       });
       test('response contains at least the logged-in user', async () => {
-        const filteredData = response.body.data.filter((user) => user.id === loggedInUser.id);
+        const filteredData = response.body.filter((user) => user.id === loggedInUser.id);
         expect(filteredData.length).toEqual(1);
       });
     });
@@ -155,13 +155,13 @@ describe('Users routes', () => {
         expect(response.type).toEqual('application/json');
       });
       test('responds body has correct user id', async () => {
-        expect(response.body.data.id).toEqual(loggedInUser.id);
+        expect(response.body.id).toEqual(loggedInUser.id);
       });
       test('responds body has correct user email', async () => {
-        expect(response.body.data.attributes.email).toEqual(loggedInUser.email);
+        expect(response.body.email).toEqual(loggedInUser.email);
       });
       test('responds body does not contain the password', async () => {
-        expect(response.body.data.attributes.password).toEqual(undefined);
+        expect(response.body.password).toEqual(undefined);
       });
     });
 
@@ -191,13 +191,13 @@ describe('Users routes', () => {
         expect(response.type).toEqual('application/json');
       });
       test('responds body has correct user id', async () => {
-        expect(response.body.data.id).toEqual(loggedOutUser.id);
+        expect(response.body.id).toEqual(loggedOutUser.id);
       });
       test('responds body has correct user email', async () => {
-        expect(response.body.data.attributes.email).toEqual(loggedOutUser.email);
+        expect(response.body.email).toEqual(loggedOutUser.email);
       });
       test('responds body does not contain the password', async () => {
-        expect(response.body.data.attributes.password).toEqual(undefined);
+        expect(response.body.password).toEqual(undefined);
       });
     });
 
@@ -227,8 +227,8 @@ describe('Users routes', () => {
             firstName: 'Nuevo firstName',
           });
         expect(updateResponse.status).toBe(200);
-        expect(updateResponse.body.data.attributes.firstName).toBe('Nuevo firstName');
-        expect(updateResponse.body.data.attributes.email).toBe(loggedInUser.email);
+        expect(updateResponse.body.firstName).toBe('Nuevo firstName');
+        expect(updateResponse.body.email).toBe(loggedInUser.email);
         const updatedUser = await app.context.orm.user.findByPk(loggedInUser.id);
         expect(updatedUser.firstName).toBe('Nuevo firstName');
         expect(updatedUser.email).toBe(loggedInUser.email);
@@ -243,8 +243,8 @@ describe('Users routes', () => {
             newPassword: 'totallynewpassword',
           });
         expect(updateResponse.status).toBe(200);
-        expect(updateResponse.body.data.attributes.firstName).toBe(loggedInUser.firstName);
-        expect(updateResponse.body.data.attributes.email).toBe(loggedInUser.email);
+        expect(updateResponse.body.firstName).toBe(loggedInUser.firstName);
+        expect(updateResponse.body.email).toBe(loggedInUser.email);
         const updatedUser = await app.context.orm.user.findByPk(loggedInUser.id);
         const isPasswordOk = await updatedUser.checkPassword('totallynewpassword');
         expect(isPasswordOk).toBe(true);
