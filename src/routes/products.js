@@ -1,16 +1,11 @@
 const KoaRouter = require('koa-router');
-const { Serializer } = require('jsonapi-serializer');
 const { uuid } = require('uuidv4');
 
 const router = new KoaRouter();
-const productSerializer = new Serializer('products', {
-  attributes: ['name', 'stock', 'price', 'unit', 'storeId'],
-  keyForAttribute: 'camelCase',
-});
 
 async function getStore(ctx, next) {
   ctx.state.store = await ctx.orm.store.findByPk(ctx.params.storeId);
-  if (!ctx.state.store) return ctx.throw(404);
+  if (!ctx.state.store) ctx.throw(404, `Store with id ${ctx.params.storeId} could not be found`);
   return next();
 }
 
@@ -27,10 +22,10 @@ router.post('products.create', '/', getStore, async (ctx) => {
       });
       await product.save({ field: ['id', 'name', 'stock', 'price', 'unit', 'storeId'] });
       ctx.status = 201;
-      ctx.body = productSerializer.serialize(product);
+      ctx.body = product;
     }
   } catch (e) {
-    if (['SequelizeAssociationError', 'SequelizeUniqueConstraintError'].includes(e.name)) {
+    if (e.name && e.name.includes('Sequelize')) {
       ctx.state.errors = e.errors;
       ctx.throw(400);
     } else if (e.status) {
@@ -42,7 +37,12 @@ router.post('products.create', '/', getStore, async (ctx) => {
 });
 
 router.param('id', async (id, ctx, next) => {
-  ctx.state.product = await ctx.orm.product.findByPk(id);
+  ctx.state.product = await ctx.orm.product.findByPk(id, {
+    include: {
+      association: 'store',
+      attributes: ['address', 'name', 'description'],
+    },
+  });
   if (!ctx.state.product) ctx.throw(404, `Product with id ${id} could not be found`);
   return next();
 });
@@ -54,11 +54,11 @@ router.get('products.list', '/', getStore, async (ctx) => {
       storeId: store.id,
     },
   });
-  ctx.body = productSerializer.serialize(products);
+  ctx.body = products;
 });
 
 router.get('products.show', '/:id', async (ctx) => {
-  ctx.body = productSerializer.serialize(ctx.state.product);
+  ctx.body = ctx.state.product;
 });
 
 module.exports = router;

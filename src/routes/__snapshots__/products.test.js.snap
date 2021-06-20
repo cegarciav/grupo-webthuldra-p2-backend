@@ -1,0 +1,89 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Products routes GET /api/stores/store_id/products/:id when passed, id does not correspond to any product response should match snapshot 1`] = `
+Object {
+  "errors": Array [
+    Object {
+      "message": "Product with id 4c74458e-f05a-4729-8f36-7836552eef32 could not be found",
+      "type": "Not Found",
+    },
+  ],
+}
+`;
+
+exports[`Products routes GET /api/stores/store_id/products/:id when request is unauthorized because user is not logged-in response should match snapshot 1`] = `
+Object {
+  "errors": Array [
+    Object {
+      "message": "Authentication Error",
+      "type": "Unauthorised",
+    },
+  ],
+}
+`;
+
+exports[`Products routes GET api/stores/:store_id/products when a user is not logged-in, a 401 error is sent by the server response should match snapshot 1`] = `
+Object {
+  "errors": Array [
+    Object {
+      "message": "Authentication Error",
+      "type": "Unauthorised",
+    },
+  ],
+}
+`;
+
+exports[`Products routes POST api/stores/:store_id/products product price should be a number response should match snapshot 1`] = `
+Object {
+  "errors": Array [
+    Object {
+      "message": "Validation min on price failed",
+      "type": "Validation error",
+    },
+  ],
+}
+`;
+
+exports[`Products routes POST api/stores/:store_id/products product price should be greater than 0 response should match snapshot 1`] = `
+Object {
+  "errors": Array [
+    Object {
+      "message": "Validation min on price failed",
+      "type": "Validation error",
+    },
+  ],
+}
+`;
+
+exports[`Products routes POST api/stores/:store_id/products product stock should be greater than 0 response should match snapshot 1`] = `
+Object {
+  "errors": Array [
+    Object {
+      "message": "Validation min on stock failed",
+      "type": "Validation error",
+    },
+  ],
+}
+`;
+
+exports[`Products routes POST api/stores/:store_id/products users cannot create products if their are logged-out response should match snapshot 1`] = `
+Object {
+  "errors": Array [
+    Object {
+      "message": "Authentication Error",
+      "type": "Unauthorised",
+    },
+  ],
+}
+`;
+
+exports[`Products routes POST api/stores/:store_id/products users cannot create products in stores they do not own response should match snapshot 1`] = `
+Object {
+  "errors": Array [
+    Object {
+      "message": "You are not allowed to add products to this store with id 0fde40ee-34f1-48f2-8831-d2ccdc0bafd5",
+      "type": "Forbidden",
+    },
+  ],
+}
+`;
