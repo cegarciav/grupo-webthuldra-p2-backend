@@ -91,4 +91,25 @@ router.patch('products.update', '/:id', getStore, async (ctx) => {
   }
 });
 
+router.delete('products.remove', '/:id', getStore, async (ctx) => {
+  const { currentUser, store, product } = ctx.state;
+  try {
+    if (store.ownerId !== currentUser.id) {
+      ctx.throw(403, `You are not allowed to remove product with id ${product.id}`);
+    } else {
+      product.destroy();
+      ctx.status = 204;
+    }
+  } catch (e) {
+    if (e.name && e.name.includes('Sequelize')) {
+      ctx.state.errors = e.errors;
+      ctx.throw(400);
+    } else if (e.status) {
+      ctx.throw(e);
+    } else {
+      ctx.throw(500);
+    }
+  }
+});
+
 module.exports = router;
