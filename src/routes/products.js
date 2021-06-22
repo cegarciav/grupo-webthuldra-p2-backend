@@ -61,4 +61,34 @@ router.get('products.show', '/:id', async (ctx) => {
   ctx.body = ctx.state.product;
 });
 
+router.patch('products.update', '/:id', getStore, async (ctx) => {
+  const { currentUser, store, product } = ctx.state;
+  try {
+    if (store.ownerId !== currentUser.id) {
+      ctx.throw(403, `You are not allowed to modify product with id ${product.id}`);
+    } else {
+      const modifications = {};
+      Object.keys(ctx.request.body)
+        .filter((param) => ['name', 'stock', 'price', 'unit'].includes(param) && ctx.request.body[param])
+        .forEach((param) => { modifications[param] = ctx.request.body[param]; });
+
+      await ctx.orm.product.update(modifications, {
+        where: { id: product.id },
+        individualHooks: true,
+      });
+      const updatedProduct = await ctx.orm.product.findByPk(product.id);
+      ctx.body = updatedProduct;
+    }
+  } catch (e) {
+    if (e.name && e.name.includes('Sequelize')) {
+      ctx.state.errors = e.errors;
+      ctx.throw(400);
+    } else if (e.status) {
+      ctx.throw(e);
+    } else {
+      ctx.throw(500);
+    }
+  }
+});
+
 module.exports = router;
