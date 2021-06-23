@@ -10,7 +10,7 @@ async function getStore(ctx, next) {
 }
 
 router.post('deals.create', '/', getStore, async (ctx) => {
-  const { currentUser } = ctx.state;
+  const { currentUser, store } = ctx.state;
   const { products } = ctx.request.body;
   if (!products || products.length === 0) {
     ctx.state.errors = [{
@@ -64,6 +64,7 @@ router.post('deals.create', '/', getStore, async (ctx) => {
       id: newId,
       status: 'abierto',
       customerId: currentUser.id,
+      storeId: store.id,
     }, { transaction });
     await ctx.orm.purchase.bulkCreate(purchases, { transaction });
     await transaction.commit();
@@ -133,6 +134,10 @@ router.patch('deals.update', '/:id', getStore, async (ctx) => {
             association: 'products',
             attributes: ['name', 'price', 'unit'],
           },
+          {
+            model: ctx.orm.store,
+            attributes: ['id', 'name'],
+          },
         ],
       });
       ctx.body = updatedDeal;
@@ -147,6 +152,29 @@ router.patch('deals.update', '/:id', getStore, async (ctx) => {
       ctx.throw(500);
     }
   }
+});
+
+router.get('deals.show', '/:id', async (ctx) => {
+  const deals = await ctx.orm.deal.findAll({
+    where: {
+      id: ctx.params.id,
+    },
+    include: [
+      {
+        association: 'customer',
+        attributes: ['firstName', 'lastName', 'email', 'id'],
+      },
+      {
+        association: 'products',
+        attributes: ['name', 'price', 'unit'],
+      },
+      {
+        model: ctx.orm.store,
+        attributes: ['id', 'name'],
+      },
+    ],
+  });
+  ctx.body = deals;
 });
 
 module.exports = router;
