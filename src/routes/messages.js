@@ -45,4 +45,19 @@ router.post('messages.create', '/', async (ctx) => {
   }
 });
 
+router.param('id', async (id, ctx, next) => {
+  ctx.state.message = await ctx.orm.message.findByPk(id);
+  if (!ctx.state.message) ctx.throw(404, `Message with id ${id} could not be found`);
+  return next();
+});
+
+router.get('messages.list', '/', async (ctx) => {
+  const messages = await ctx.orm.message.findAll({
+    where: {
+      dealId: ctx.params.dealId,
+    },
+  });
+  ctx.body = messages;
+});
+
 module.exports = router;

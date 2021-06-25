@@ -79,6 +79,10 @@ router.post('deals.create', '/', getStore, async (ctx) => {
           association: 'products',
           attributes: ['name', 'price', 'unit'],
         },
+        {
+          model: ctx.orm.store,
+          attributes: ['id', 'name'],
+        },
       ],
     });
     ctx.body = completeDeal;
