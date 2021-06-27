@@ -28,6 +28,13 @@ describe('Deals routes', () => {
     description: 'Una tienda que vende productos',
     ownerId: ownerFields.id,
   };
+  const store2Fields = {
+    id: uuid(),
+    address: 'Fake Street 124',
+    name: 'Tienda 2',
+    description: 'Otra tienda que vende productos',
+    ownerId: ownerFields.id,
+  };
   const productsFields = [
     {
       id: uuid(),
@@ -45,6 +52,14 @@ describe('Deals routes', () => {
       storeId: storeFields.id,
     },
   ];
+  const product2ndStore = {
+    id: uuid(),
+    name: 'Producto 3',
+    stock: 100,
+    price: 10000,
+    unit: 'kg',
+    storeId: store2Fields.id,
+  };
 
   beforeAll(async () => {
     await app.context.orm.sequelize.sync({ force: true });
@@ -62,6 +77,8 @@ describe('Deals routes', () => {
     authOwner = authOwnerResponse.body;
 
     await app.context.orm.store.create(storeFields);
+    await app.context.orm.store.create(store2Fields);
+    await app.context.orm.product.create(product2ndStore);
     await app.context.orm.product.bulkCreate(productsFields);
   });
 
@@ -143,8 +160,6 @@ describe('Deals routes', () => {
           .auth(authCustomer.accessToken, { type: 'bearer' });
         expect(createResponse.status).toBe(400);
         expect(createResponse.body.errors.length).toBe(1);
-        expect(createResponse.body.errors[0].message)
-          .toBe('Attribute products is mandatory and must have a length greater than 0');
       });
       test('attribute products is not properly formed: amount equal to 0', async () => {
         const dealData = {
@@ -162,8 +177,6 @@ describe('Deals routes', () => {
           .auth(authCustomer.accessToken, { type: 'bearer' });
         expect(createResponse.status).toBe(400);
         expect(createResponse.body.errors.length).toBe(1);
-        expect(createResponse.body.errors[0].message)
-          .toBe('Attribute products is not properly formed. Every product must contain a valid product id and an amount');
       });
       test('attribute products is not properly formed: repeated product with negative total amount', async () => {
         const dealData = {
@@ -185,8 +198,6 @@ describe('Deals routes', () => {
           .auth(authCustomer.accessToken, { type: 'bearer' });
         expect(createResponse.status).toBe(400);
         expect(createResponse.body.errors.length).toBe(1);
-        expect(createResponse.body.errors[0].message)
-          .toBe('Attribute products is not properly formed. Every product must contain a valid product id and an amount');
       });
       test('attribute products is not properly formed: product does not exist', async () => {
         const dealData = {
@@ -204,8 +215,27 @@ describe('Deals routes', () => {
           .auth(authCustomer.accessToken, { type: 'bearer' });
         expect(createResponse.status).toBe(400);
         expect(createResponse.body.errors.length).toBe(1);
-        expect(createResponse.body.errors[0].message)
-          .toBe('One of the products sent does not exist');
+      });
+      test('attribute products is not properly formed: products from different stores', async () => {
+        const dealData = {
+          products: [
+            {
+              id: productsFields[0].id,
+              amount: 10,
+            },
+            {
+              id: product2ndStore.id,
+              amount: 10,
+            },
+          ],
+        };
+        const createResponse = await request
+          .post(`/api/stores/${storeFields.id}/deals`)
+          .set('Content-type', 'application/json')
+          .send(dealData)
+          .auth(authCustomer.accessToken, { type: 'bearer' });
+        expect(createResponse.status).toBe(400);
+        expect(createResponse.body.errors.length).toBe(1);
       });
       test('unauthorized request to endpoint', async () => {
         const createResponse = await request
