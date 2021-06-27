@@ -11,13 +11,10 @@ async function getStore(ctx, next) {
 
 router.post('deals.create', '/', getStore, async (ctx) => {
   const { currentUser, store } = ctx.state;
-<<<<<<< HEAD
-=======
   if (store.ownerId === currentUser.id) {
     ctx.throw(403, 'You are not allowed to create a deal in your own store');
   }
 
->>>>>>> main
   const { products } = ctx.request.body;
   if (!products || products.length === 0) {
     ctx.state.errors = [{
