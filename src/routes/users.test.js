@@ -8,7 +8,7 @@ describe('Users routes', () => {
   let auth;
   let loggedInUser;
   let loggedOutUser;
-  const userFields = {
+  let userFields = {
     id: uuid(),
     firstName: 'Test',
     lastName: 'User',
@@ -223,7 +223,7 @@ describe('Users routes', () => {
           .patch(`/api/users/${loggedInUser.id}`)
           .auth(auth.accessToken, { type: 'bearer' })
           .send({
-            password: loggedInUser.password,
+            password: userFields.password,
             firstName: 'Nuevo firstName',
           });
         expect(updateResponse.status).toBe(200);
@@ -235,28 +235,33 @@ describe('Users routes', () => {
         loggedInUser = updatedUser;
       });
       test('a user can modify their password sending newPassword attribute', async () => {
+        const newPassword = 'totallynewpassword';
         const updateResponse = await request
           .patch(`/api/users/${loggedInUser.id}`)
           .auth(auth.accessToken, { type: 'bearer' })
           .send({
-            password: loggedInUser.password,
-            newPassword: 'totallynewpassword',
+            password: userFields.password,
+            newPassword,
           });
         expect(updateResponse.status).toBe(200);
         expect(updateResponse.body.firstName).toBe(loggedInUser.firstName);
         expect(updateResponse.body.email).toBe(loggedInUser.email);
         const updatedUser = await app.context.orm.user.findByPk(loggedInUser.id);
-        const isPasswordOk = await updatedUser.checkPassword('totallynewpassword');
+        const isPasswordOk = await updatedUser.checkPassword(newPassword);
         expect(isPasswordOk).toBe(true);
         expect(updatedUser.email).toBe(loggedInUser.email);
         loggedInUser = updatedUser;
+        userFields = {
+          ...userFields,
+          password: newPassword,
+        };
       });
       test('a user firstName cannot be empty', async () => {
         const updateResponse = await request
           .patch(`/api/users/${loggedInUser.id}`)
           .auth(auth.accessToken, { type: 'bearer' })
           .send({
-            password: loggedInUser.password,
+            password: userFields.password,
             firstName: '',
           });
         expect(updateResponse.status).toBe(400);
@@ -297,7 +302,7 @@ describe('Users routes', () => {
         const updateResponse = await request
           .patch(`/api/users/${loggedInUser.id}`)
           .send({
-            password: loggedInUser.password,
+            password: userFields.password,
             firstName: 'Steve',
           });
         expect(updateResponse.status).toBe(401);
