@@ -159,10 +159,7 @@ router.patch('deals.update', '/:id', getStore, async (ctx) => {
 });
 
 router.get('deals.show', '/:id', async (ctx) => {
-  const deals = await ctx.orm.deal.findAll({
-    where: {
-      id: ctx.params.id,
-    },
+  const deals = await ctx.orm.deal.findByPk(ctx.params.id, {
     include: [
       {
         association: 'customer',

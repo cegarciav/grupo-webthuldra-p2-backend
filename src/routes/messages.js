@@ -27,7 +27,7 @@ router.post('messages.create', '/', async (ctx) => {
         id: uuid(),
         dealId: deal.id,
         sender: 'store',
-        senderId: store.ownerId,
+        senderId: store.id,
       });
       await message.save({ field: ['id', 'text', 'dealId', 'sender', 'senderId'] });
       ctx.status = 201;
