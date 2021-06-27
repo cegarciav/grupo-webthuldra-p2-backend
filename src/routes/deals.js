@@ -11,6 +11,13 @@ async function getStore(ctx, next) {
 
 router.post('deals.create', '/', getStore, async (ctx) => {
   const { currentUser, store } = ctx.state;
+<<<<<<< HEAD
+=======
+  if (store.ownerId === currentUser.id) {
+    ctx.throw(403, 'You are not allowed to create a deal in your own store');
+  }
+
+>>>>>>> main
   const { products } = ctx.request.body;
   if (!products || products.length === 0) {
     ctx.state.errors = [{
@@ -19,6 +26,15 @@ router.post('deals.create', '/', getStore, async (ctx) => {
     }];
     ctx.throw(400);
   }
+
+  const availableProducts = (await ctx.orm.product
+    .findAll({
+      where: {
+        storeId: store.id,
+      },
+    }))
+    .map((product) => product.id);
+
   const newId = uuid();
   let purchases;
   try {
@@ -48,10 +64,17 @@ router.post('deals.create', '/', getStore, async (ctx) => {
         return cleanList;
       }, [])
       .filter((product) => product.productId && product.amount > 0);
-    if (purchases.length === 0) throw Error();
+    if (purchases.length === 0) {
+      throw Error('Attribute products is not properly formed. Every product must contain a valid product id and amount');
+    }
+    const validPurchases = purchases
+      .filter((product) => availableProducts.includes(product.productId));
+    if (purchases.length !== validPurchases.length) {
+      throw Error('Attribute products is not properly formed. Every product must be sold by the store');
+    }
   } catch (e) {
     ctx.state.errors = [{
-      message: 'Attribute products is not properly formed. Every product must contain a valid product id and an amount',
+      message: e.message,
       type: 'Wrong format',
     }];
     ctx.throw(400);
