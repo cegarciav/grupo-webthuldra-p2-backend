@@ -92,7 +92,7 @@ router.patch('users.update', '/:id', async (ctx) => {
       ctx.throw(403, `You are not allowed to modify user with id ${user.id}`);
     } else {
       const { password } = ctx.request.body;
-      if (!password || !user.checkPassword(password)) {
+      if (!password || !await user.checkPassword(password)) {
         ctx.throw(401, 'You need to send your current password to modify your profile');
       }
       const { newPassword } = ctx.request.body;

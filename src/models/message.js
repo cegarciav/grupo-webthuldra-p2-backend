@@ -3,7 +3,7 @@ const {
 } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-  class deal extends Model {
+  class message extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,27 +11,24 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsTo(models.user, { as: 'customer' });
-      this.belongsToMany(models.product, { through: models.purchase, as: 'products' });
-      this.belongsTo(models.store);
-      this.hasMany(models.message);
+      this.belongsTo(models.deal);
     }
   }
 
-  deal.init({
+  message.init({
     id: {
       allowNull: false,
       primaryKey: true,
       type: DataTypes.UUID,
     },
-    status: {
+    text: {
       type: DataTypes.STRING,
+      allowNull: false,
       validate: {
         notEmpty: true,
-        isIn: [['abierto', 'completado', 'rechazado']],
       },
     },
-    customerId: {
+    dealId: {
       type: DataTypes.UUID,
       allowNull: false,
       validate: {
@@ -39,7 +36,14 @@ module.exports = (sequelize, DataTypes) => {
         isUUID: 4,
       },
     },
-    storeId: {
+    sender: {
+      type: DataTypes.STRING,
+      validate: {
+        notEmpty: true,
+        isIn: [['customer', 'store']],
+      },
+    },
+    senderId: {
       type: DataTypes.UUID,
       allowNull: false,
       validate: {
@@ -49,7 +53,7 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     sequelize,
-    modelName: 'deal',
+    modelName: 'message',
   });
-  return deal;
+  return message;
 };
