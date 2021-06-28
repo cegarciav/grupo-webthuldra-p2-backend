@@ -3,47 +3,47 @@ const {
 } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-  class store extends Model {
+  class comment extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
-      this.belongsTo(models.user, { as: 'owner' });
-      this.hasMany(models.product, { foreignKey: 'storeId' });
-      this.hasMany(models.deal);
-      this.hasMany(models.comment);
+      this.belongsTo(models.user, { as: 'reviewer' });
+      this.belongsTo(models.store);
     }
   }
 
-  store.init({
+  comment.init({
     id: {
       allowNull: false,
       primaryKey: true,
       type: DataTypes.UUID,
     },
-    address: {
+    text: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
       validate: {
         notEmpty: true,
       },
     },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
+    grade: {
+      type: DataTypes.INTEGER,
       validate: {
-        notEmpty: true,
+        min: 0,
+        max: 5,
       },
     },
-    description: {
-      type: DataTypes.STRING,
+    reviewerId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+        isUUID: 4,
+      },
     },
-    ownerId: {
+    storeId: {
       type: DataTypes.UUID,
       allowNull: false,
       validate: {
@@ -53,7 +53,7 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     sequelize,
-    modelName: 'store',
+    modelName: 'comment',
   });
-  return store;
+  return comment;
 };
