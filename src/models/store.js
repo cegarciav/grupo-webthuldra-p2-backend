@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.user, { as: 'owner' });
       this.hasMany(models.product, { foreignKey: 'storeId' });
       this.hasMany(models.deal);
+      this.hasMany(models.comment);
     }
   }
 
