@@ -364,7 +364,7 @@ describe('Products routes', () => {
         expect(updateResponse.status).toBe(200);
       });
     });
-    describe('a user cannot modify a deal of a store they do not own', () => {
+    describe('a user cannot modify a product of a store they do not own', () => {
       let updateResponse;
       beforeAll(async () => {
         updateResponse = await request
@@ -387,6 +387,34 @@ describe('Products routes', () => {
           .set('Content-type', 'application/json')
           .send({ name: 'producto testeado 2' });
         expect(updateResponse.status).toBe(401);
+      });
+    });
+  });
+  describe('DELETE /stores/:storeId/products/:id', () => {
+    let createdProduct;
+    const productData = {
+      name: 'producto1',
+      stock: 10,
+      price: 500,
+      unit: 'unit',
+    };
+    beforeAll(async () => {
+      createdProduct = await request
+        .post(`/api/stores/${store.id}/products`)
+        .set('Content-type', 'application/json')
+        .send(productData)
+        .auth(authOwner.accessToken, { type: 'bearer' });
+    });
+    describe('store owner can delete a product in their store', () => {
+      let updateResponse;
+      beforeAll(async () => {
+        updateResponse = await request
+          .patch(`/api/stores/${storeFields.id}/products/${createdProduct.body.id}`)
+          .send(createdProduct.destroy())
+          .auth(authOwner.accessToken, { type: 'bearer' });
+      });
+      test('response with 200 status code', async () => {
+        expect(updateResponse.status).toBe(200);
       });
     });
   });
