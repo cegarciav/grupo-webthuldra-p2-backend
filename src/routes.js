@@ -10,6 +10,7 @@ const products = require('./routes/products');
 const deals = require('./routes/deals');
 const messages = require('./routes/messages');
 const admin = require('./routes/admin');
+const comments = require('./routes/comments');
 
 const router = new KoaRouter({ prefix: '/api' });
 
@@ -75,5 +76,6 @@ router.use('/stores/:storeId/products', products.routes());
 router.use('/stores/:storeId/deals', deals.routes());
 router.use('/deals/:dealId/messages', messages.routes());
 router.use('/admin', admin.routes());
+router.use('/stores/:storeId/comments', comments.routes());
 
 module.exports = router;
