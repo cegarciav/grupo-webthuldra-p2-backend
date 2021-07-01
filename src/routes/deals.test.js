@@ -398,4 +398,31 @@ describe('Deals routes', () => {
       });
     });
   });
+  describe('GET /api/stores/store_id/deals/:id', () => {
+    let createdDeal;
+    const dealData = {
+      products: [
+        {
+          id: productsFields[1].id,
+          amount: 10,
+        },
+      ],
+    };
+    beforeAll(async () => {
+      createdDeal = await request
+        .post(`/api/stores/${storeFields.id}/deals`)
+        .set('Content-type', 'application/json')
+        .send(dealData)
+        .auth(authCustomer.accessToken, { type: 'bearer' });
+    });
+    describe('store owner can modify a deal in their store', () => {
+      test('store owner can change the status of a deal to "completado"', async () => {
+        const updateResponse = await request
+          .get(`/api/stores/${storeFields.id}/deals/${createdDeal.body.id}`)
+          .auth(authOwner.accessToken, { type: 'bearer' });
+        expect(updateResponse.status).toBe(200);
+        expect(updateResponse.type).toEqual('application/json');
+      });
+    });
+  });
 });
