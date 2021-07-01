@@ -415,8 +415,8 @@ describe('Deals routes', () => {
         .send(dealData)
         .auth(authCustomer.accessToken, { type: 'bearer' });
     });
-    describe('store owner can modify a deal in their store', () => {
-      test('store owner can change the status of a deal to "completado"', async () => {
+    describe('only a logged-in user can retrive its information', () => {
+      test('user get information about deals', async () => {
         const updateResponse = await request
           .get(`/api/stores/${storeFields.id}/deals/${createdDeal.body.id}`)
           .auth(authOwner.accessToken, { type: 'bearer' });
