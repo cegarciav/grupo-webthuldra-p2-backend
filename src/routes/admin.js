@@ -77,17 +77,21 @@ router.delete('users.remove', '/users/:userId', async (ctx) => {
     const user = await ctx.orm.user.findByPk(ctx.params.userId);
     if (admin.length === 0) {
       ctx.throw(403, 'You are not allowed to erase an user if you are not an administrator');
+    } else if (Object.is(user, null)) {
+      ctx.throw(404, `User with id ${ctx.params.userId} could not be found`);
     } else {
       const stores = await ctx.orm.store.findAll({
         where: { ownerId: user.id },
       });
       stores.forEach(async (store) => {
+        // Estos dos siguientes tienen problemas.
         await ctx.orm.message.destroy({
           where: { senderId: store.id },
         });
         await ctx.orm.deal.destroy({
           where: { storeId: store.id },
         });
+        // Estos dos anteriores tienen problemas.
         await ctx.orm.comment.destroy({
           where: { storeId: store.id },
         });
@@ -111,7 +115,14 @@ router.delete('users.remove', '/users/:userId', async (ctx) => {
       ctx.status = 204;
     }
   } catch (e) {
-    console.log(e);
+    if (e.name && e.name.includes('Sequelize')) {
+      ctx.state.errors = e.errors;
+      ctx.throw(400);
+    } else if (e.status) {
+      ctx.throw(e);
+    } else {
+      ctx.throw(500);
+    }
   }
 });
 
@@ -150,15 +161,34 @@ router.delete('stores.remove', '/stores/:storeId', async (ctx) => {
     });
     const store = await ctx.orm.store.findByPk(ctx.params.storeId);
     if (admin.length === 0) {
-      ctx.throw(403, 'You are not allowed to erase a comment if you are not an administrator');
+      ctx.throw(403, 'You are not allowed to erase an user if you are not an administrator');
     } else if (Object.is(store, null)) {
-      ctx.throw(404, `Store with id ${ctx.params.commentId} could not be found`);
+      ctx.throw(404, `Store with id ${ctx.params.storeId} could not be found`);
     } else {
+      await ctx.orm.comment.destroy({
+        where: { storeId: store.id },
+      });
+      await ctx.orm.message.destroy({
+        where: { senderId: store.id },
+      });
+      await ctx.orm.deal.destroy({
+        where: { storeId: store.id },
+      });
+      await ctx.orm.product.destroy({
+        where: { storeId: store.id },
+      });
       await store.destroy();
       ctx.status = 204;
     }
   } catch (e) {
-    console.log(e);
+    if (e.name && e.name.includes('Sequelize')) {
+      ctx.state.errors = e.errors;
+      ctx.throw(400);
+    } else if (e.status) {
+      ctx.throw(e);
+    } else {
+      ctx.throw(500);
+    }
   }
 });
 
