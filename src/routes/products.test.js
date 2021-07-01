@@ -409,12 +409,12 @@ describe('Products routes', () => {
       let updateResponse;
       beforeAll(async () => {
         updateResponse = await request
-          .patch(`/api/stores/${storeFields.id}/products/${createdProduct.body.id}`)
+          .delete(`/api/stores/${storeFields.id}/products/${createdProduct.body.id}`)
           .send(createdProduct.destroy())
           .auth(authOwner.accessToken, { type: 'bearer' });
       });
-      test('response with 200 status code', async () => {
-        expect(updateResponse.status).toBe(200);
+      test('response with 204 status code', async () => {
+        expect(updateResponse.status).toBe(204);
       });
     });
   });
