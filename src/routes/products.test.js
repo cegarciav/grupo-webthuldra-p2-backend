@@ -7,6 +7,7 @@ describe('Products routes', () => {
   let authOwner;
   let store;
   let product;
+  let authUser2;
   const ownerFields = {
     id: '0fde40ee-34f1-48f2-8831-d2ccdc0bafd5',
     firstName: 'Test',
@@ -20,6 +21,20 @@ describe('Products routes', () => {
     lastName: 'User',
     email: 'test2@user.cl',
     password: 'testPassword',
+  };
+  const user2Fields = {
+    id: '0fde40ee-34f1-48f2-8831-d2ccdc0bafd6',
+    firstName: 'Test2',
+    lastName: 'User2',
+    email: 'test3@user.cl',
+    password: 'testPassword1',
+  };
+  const notUser2Fields = {
+    id: '24520978-736d-4090-af65-bb9e28d85204',
+    firstName: 'Test2',
+    lastName: 'User2',
+    email: 'test4@user.cl',
+    password: 'testPassword2',
   };
   const storeFields = {
     id: '988006ed-f661-485d-bf3d-5cca0b11c1a1',
@@ -67,6 +82,17 @@ describe('Products routes', () => {
       .post('/api/auth')
       .set('Content-type', 'application/json')
       .send({ email: notOwnerFields.email, password: notOwnerFields.password });
+    await app.context.orm.user.create(user2Fields);
+    await app.context.orm.user.create(notUser2Fields);
+    let user2Response = await request
+      .post('/api/auth')
+      .set('Content-type', 'application/json')
+      .send({ email: user2Fields.email, password: user2Fields.password });
+    authUser2 = user2Response.body;
+    user2Response = await request
+      .post('/api/auth')
+      .set('Content-type', 'application/json')
+      .send({ email: notUser2Fields.email, password: notUser2Fields.password });
   });
 
   afterAll(async () => {
@@ -307,6 +333,88 @@ describe('Products routes', () => {
       });
       test('response should match snapshot', async () => {
         expect(createResponse.body).toMatchSnapshot();
+      });
+    });
+  });
+  describe('PATCH /stores/:storeId/products/:id', () => {
+    let createdProduct;
+    const productData = {
+      name: 'producto1',
+      stock: 10,
+      price: 500,
+      unit: 'unit',
+    };
+    beforeAll(async () => {
+      createdProduct = await request
+        .post(`/api/stores/${store.id}/products`)
+        .set('Content-type', 'application/json')
+        .send(productData)
+        .auth(authOwner.accessToken, { type: 'bearer' });
+    });
+    describe('store owner can modify a product in their store', () => {
+      let updateResponse;
+      beforeAll(async () => {
+        updateResponse = await request
+          .patch(`/api/stores/${storeFields.id}/products/${createdProduct.body.id}`)
+          .set('Content-type', 'application/json')
+          .send({ name: 'producto testeado' })
+          .auth(authOwner.accessToken, { type: 'bearer' });
+      });
+      test('response with 200 status code', async () => {
+        expect(updateResponse.status).toBe(200);
+      });
+    });
+    describe('a user cannot modify a product of a store they do not own', () => {
+      let updateResponse;
+      beforeAll(async () => {
+        updateResponse = await request
+          .patch(`/api/stores/${storeFields.id}/products/${createdProduct.body.id}`)
+          .set('Content-type', 'application/json')
+          .send({ name: 'producto testeado 2' })
+          .auth(authUser2.accessToken, { type: 'bearer' });
+      });
+      test('response with 403 status code', async () => {
+        expect(updateResponse.status).toBe(403);
+      });
+      test('response with a json body type', async () => {
+        expect(updateResponse.type).toEqual('application/json');
+      });
+    });
+    describe('request is unauthorized because user is not logged in', () => {
+      test('users cannot modify products if their are logged-out', async () => {
+        const updateResponse = await request
+          .patch(`/api/stores/${storeFields.id}/products/${createdProduct.body.id}`)
+          .set('Content-type', 'application/json')
+          .send({ name: 'producto testeado 2' });
+        expect(updateResponse.status).toBe(401);
+      });
+    });
+  });
+  describe('DELETE /stores/:storeId/products/:id', () => {
+    let createdProduct;
+    const productData = {
+      name: 'producto1',
+      stock: 10,
+      price: 500,
+      unit: 'unit',
+    };
+    beforeAll(async () => {
+      createdProduct = await request
+        .post(`/api/stores/${store.id}/products`)
+        .set('Content-type', 'application/json')
+        .send(productData)
+        .auth(authOwner.accessToken, { type: 'bearer' });
+    });
+    describe('store owner can delete a product in their store', () => {
+      let updateResponse;
+      beforeAll(async () => {
+        updateResponse = await request
+          .delete(`/api/stores/${storeFields.id}/products/${createdProduct.body.id}`)
+          .send(createdProduct.destroy())
+          .auth(authOwner.accessToken, { type: 'bearer' });
+      });
+      test('response with 204 status code', async () => {
+        expect(updateResponse.status).toBe(204);
       });
     });
   });
