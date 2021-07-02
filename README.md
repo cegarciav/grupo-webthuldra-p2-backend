@@ -23,30 +23,31 @@ https://webthuldra-api.herokuapp.com/
 
 ## Documentacion:
 
-deal:
+###Deal:
 
-PATH: POST   /stores/{storeId}/deals
+###PATH: POST   /stores/{storeId}/deals
 
 Descripcion: se puede agregar una promesa de compra.
 
-Parametros: 
-    -storeId: Id de una tienda. 
+Parametros:  
 
-Body request: 
+    *storeId: Id de una tienda. 
+
+Body request:  
     {
-    "products": [
-        {
-            "id": "6fab7fcb-ef1a-4199-a16a-0a6e5efcb1fe",
-            "amount": "3"
-        },
-        {
-            "id": "73100d2c-0331-4450-95c9-c4249917bb1f",
-            "amount": "2"
-        }
-    ]
-}
+        "products": [
+            {
+                "id": "6fab7fcb-ef1a-4199-a16a-0a6e5efcb1fe",
+                "amount": "3"
+            },
+            {
+                "id": "73100d2c-0331-4450-95c9-c4249917bb1f",
+                "amount": "2"
+            }
+        ]
+    }
 
-Responses: 
+Responses:  
 
     201: Deal agregado exitosamente
     Ejemplo: 
@@ -76,15 +77,16 @@ Responses:
         }
     }
 
-#Endpoints Secundarios: 
+##Endpoints Secundarios: ##
 
-#PATH: PATCH   /stores/{storeId}/products/:id
+###PATH: PATCH   /stores/{storeId}/products/:id ###
 
 Descripcion: Se puede modificar un producto de una tienda. Solo se puede realizar por el dueño de la tienda.
 
-Parametros: 
-    -storeId: Id de una tienda.
-    -id: Id de un producto
+Parametros:  
+
+    *storeId: Id de una tienda.
+    *id: Id de un producto
 
 Body request: 
     {
@@ -118,15 +120,17 @@ Responses:
     Ejemplo: 
         You are not allowed to modify product with id ${product.id}
 
-#PATH: DELETE   /stores/{storeId}/products/:id
+###PATH: DELETE   /stores/{storeId}/products/:id ###
 
 Descripcion: Se puede eliminar un producto de una tienda. Solo se puede realizar por el dueño de la tienda.
 
-Parametros: 
-    -storeId: Id de una tienda.
-    -id: Id de un producto
+Parametros:  
 
-Body request: No aplica
+    *storeId: Id de una tienda.
+    *id: Id de un producto
+
+Body request: No aplica  
+
     {}
 
 Responses: 
@@ -143,14 +147,14 @@ Responses:
     Ejemplo:
         Bad request
 
-#PATH: GET   /deals/{dealId}/messages
+###PATH: GET   /deals/{dealId}/messages ###
 
 Descripcion: Obtiene los mensajes de un deal.
 
-Parametros: 
-    -dealId: Id de un deal.
+Parametros:  
+    *dealId: Id de un deal.
 
-Body request: No aplica
+Body request: No aplica  
     {}
 
 Responses: 
@@ -182,14 +186,14 @@ Responses:
     Ejemplo:
         Message with id ${id} could not be found
 
-#PATH: POST   /deals/{dealId}/messages
+###PATH: POST   /deals/{dealId}/messages ###
 
 Descripcion: Obtiene los mensajes de un deal.
 
-Parametros: 
-    -dealId: Id de un deal.
+Parametros:  
+    *dealId: Id de un deal.
 
-Body request:
+Body request:  
     {
         "text": "me gustaron, buen servicio"
     }
@@ -216,14 +220,14 @@ Responses:
     Ejemplo:
         Bad Request
 
-#PATH: GET   /stores/{storeId}/comments
+###PATH: GET   /stores/{storeId}/comments ###
 
 Descripcion: Obtiene los comentarios de una tienda.
 
-Parametros: 
-    -storeId: Id de una store.
+Parametros:  
+    *storeId: Id de una store.
 
-Body request: No aplica
+Body request: No aplica  
     {}
 
 Responses: 
@@ -255,14 +259,14 @@ Responses:
     Ejemplo:
         Comment with id ${id} could not be found
 
-#PATH: POST   /stores/{storeId}/comments
+###PATH: POST   /stores/{storeId}/comments ###
 
 Descripcion: Se crea un comentario en una tienda.
 
-Parametros: 
-    -storeId: Id de una store.
+Parametros:  
+    *storeId: Id de una store.
 
-Body request: grade es una puntuacion de 1 a 5. 
+Body request: grade es una puntuacion de 1 a 5.  
     {
         "text": "Comentario",
         "grade": 5
@@ -295,15 +299,15 @@ Responses:
     Ejemplo:
         Bad request
 
-#PATH: DELETE   /stores/{storeId}/comments/:id
+###PATH: DELETE   /stores/{storeId}/comments/:id ###
 
 Descripcion: Se elimina un comentario en una tienda.
 
-Parametros: 
-    -storeId: Id de una store.
-    -id: Id de un comment.
+Parametros:  
+    *storeId: Id de una store.
+    *id: Id de un comment.
 
-Body request: No aplica
+Body request: No aplica  
     {}
 
 Responses: 
