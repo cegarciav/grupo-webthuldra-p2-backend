@@ -6,27 +6,32 @@ const router = new KoaRouter();
 router.post('comments.create', '/', async (ctx) => {
   const { currentUser } = ctx.state;
   try {
-    const comment = ctx.orm.comment.build({
-      ...ctx.request.body,
-      id: uuid(),
-      reviewerId: currentUser.id,
-      storeId: ctx.params.storeId,
-    });
-    await comment.save({ field: ['id', 'text', 'grade', 'reviewerId', 'storeId'] });
-    ctx.status = 201;
-    const completeComment = await ctx.orm.comment.findByPk(comment.id, {
-      include: [
-        {
-          association: 'store',
-          attributes: ['name', 'address'],
-        },
-        {
-          association: 'reviewer',
-          attributes: ['firstName', 'lastName', 'email'],
-        },
-      ],
-    });
-    ctx.body = completeComment;
+    const store = await ctx.orm.store.findByPk(ctx.params.storeId);
+    if (Object.is(store, null)) {
+      ctx.throw(404, `Store with id ${ctx.params.storeId} could not be found`);
+    } else {
+      const comment = ctx.orm.comment.build({
+        ...ctx.request.body,
+        id: uuid(),
+        reviewerId: currentUser.id,
+        storeId: store.id,
+      });
+      await comment.save({ field: ['id', 'text', 'grade', 'reviewerId', 'storeId'] });
+      ctx.status = 201;
+      const completeComment = await ctx.orm.comment.findByPk(comment.id, {
+        include: [
+          {
+            association: 'store',
+            attributes: ['name', 'address'],
+          },
+          {
+            association: 'reviewer',
+            attributes: ['firstName', 'lastName', 'email'],
+          },
+        ],
+      });
+      ctx.body = completeComment;
+    }
   } catch (e) {
     if (e.name && e.name.includes('Sequelize')) {
       ctx.state.errors = e.errors;
