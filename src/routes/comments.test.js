@@ -133,18 +133,6 @@ describe('Comments routes', () => {
     });
   });
   describe('DELETE /stores/:storeId/comments/:id', () => {
-    let createResponse;
-    const commentsFields = {
-      text: 'comment',
-      grade: 5,
-    };
-    beforeAll(async () => {
-      createResponse = await request
-        .post(`/api/stores/${storeFields.id}/comments`)
-        .set('Content-type', 'application/json')
-        .send(commentsFields)
-        .auth(authCustomer.accessToken, { type: 'bearer' });
-    });
     describe('store owner can delete a product in their store', () => {
       let updateResponse;
       beforeAll(async () => {
