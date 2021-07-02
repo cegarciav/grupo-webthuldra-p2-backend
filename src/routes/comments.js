@@ -12,6 +12,8 @@ router.post('comments.create', '/', async (ctx) => {
       reviewerId: currentUser.id,
       storeId: ctx.params.storeId,
     });
+    console.log(comment);
+    console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
     await comment.save({ field: ['id', 'text', 'grade', 'reviewerId', 'storeId'] });
     ctx.status = 201;
     const completeComment = await ctx.orm.comment.findByPk(comment.id, {
@@ -26,6 +28,8 @@ router.post('comments.create', '/', async (ctx) => {
         },
       ],
     });
+    console.log(completeComment);
+    console.log('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb');
     ctx.body = completeComment;
   } catch (e) {
     if (e.name && e.name.includes('Sequelize')) {
