@@ -97,7 +97,7 @@ router.delete('products.remove', '/:id', getStore, async (ctx) => {
     if (store.ownerId !== currentUser.id) {
       ctx.throw(403, `You are not allowed to remove product with id ${product.id}`);
     } else {
-      product.destroy();
+      await product.destroy();
       ctx.status = 204;
     }
   } catch (e) {
