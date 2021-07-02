@@ -4,10 +4,10 @@ const { uuid } = require('uuidv4');
 const router = new KoaRouter();
 
 router.post('messages.create', '/', async (ctx) => {
-  const { currentUser } = ctx.state;
-  const deal = await ctx.orm.deal.findByPk(ctx.params.dealId);
-  const store = await ctx.orm.store.findByPk(deal.storeId);
   try {
+    const { currentUser } = ctx.state;
+    const deal = await ctx.orm.deal.findByPk(ctx.params.dealId);
+    const store = await ctx.orm.store.findByPk(deal.storeId);
     if (currentUser.id !== deal.customerId && currentUser.id !== store.ownerId) {
       ctx.throw(403, `You are not allowed to send messages about deal with id ${deal.id}`);
     } else if (currentUser.id === deal.customerId) {
@@ -34,7 +34,13 @@ router.post('messages.create', '/', async (ctx) => {
       ctx.body = message;
     }
   } catch (e) {
-    if (e.name && e.name.includes('Sequelize')) {
+    if (e.name === 'SequelizeDatabaseError') {
+      ctx.state.errors = [{
+        message: 'Invalid dealId',
+        type: 'Invalid url param',
+      }];
+      ctx.throw(400);
+    } else if (e.name && e.name.includes('Sequelize')) {
       ctx.state.errors = e.errors;
       ctx.throw(400);
     } else if (e.status) {
@@ -46,9 +52,21 @@ router.post('messages.create', '/', async (ctx) => {
 });
 
 router.param('id', async (id, ctx, next) => {
-  ctx.state.message = await ctx.orm.message.findByPk(id);
-  if (!ctx.state.message) ctx.throw(404, `Message with id ${id} could not be found`);
-  return next();
+  try {
+    ctx.state.message = await ctx.orm.message.findByPk(id);
+    if (!ctx.state.message) ctx.throw(404, `Message with id ${id} could not be found`);
+    return next();
+  } catch (e) {
+    if (e.name && e.name.includes('Sequelize')) {
+      ctx.state.errors = e.errors;
+      ctx.throw(400);
+    } else if (e.status) {
+      ctx.throw(e);
+    } else {
+      ctx.throw(500);
+    }
+    return null;
+  }
 });
 
 router.get('messages.list', '/', async (ctx) => {
