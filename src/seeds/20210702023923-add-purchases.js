@@ -143,7 +143,7 @@ module.exports = {
       },
     ];
 
-    return queryInterface.bulkInsert('puchases', purchases, {});
+    return queryInterface.bulkInsert('purchases', purchases, {});
   },
 
   down: async (queryInterface) => queryInterface.bulkDelete('purchases', null, {

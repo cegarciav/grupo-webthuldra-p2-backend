@@ -83,22 +83,24 @@ router.delete('users.remove', '/users/:userId', async (ctx) => {
       const stores = await ctx.orm.store.findAll({
         where: { ownerId: user.id },
       });
-      stores.forEach(async (store) => {
-        // Estos dos siguientes tienen problemas.
-        await ctx.orm.message.destroy({
-          where: { senderId: store.id },
-        });
-        await ctx.orm.deal.destroy({
-          where: { storeId: store.id },
-        });
-        // Estos dos anteriores tienen problemas.
-        await ctx.orm.comment.destroy({
-          where: { storeId: store.id },
-        });
-        await ctx.orm.product.destroy({
-          where: { storeId: store.id },
-        });
-      });
+      await Promise.all(
+        stores.map(async (store) => {
+          // Estos dos siguientes tienen problemas.
+          await ctx.orm.message.destroy({
+            where: { senderId: store.id },
+          });
+          await ctx.orm.deal.destroy({
+            where: { storeId: store.id },
+          });
+          // Estos dos anteriores tienen problemas.
+          await ctx.orm.comment.destroy({
+            where: { storeId: store.id },
+          });
+          await ctx.orm.product.destroy({
+            where: { storeId: store.id },
+          });
+        }),
+      );
       await ctx.orm.comment.destroy({
         where: { reviewerId: user.id },
       });
