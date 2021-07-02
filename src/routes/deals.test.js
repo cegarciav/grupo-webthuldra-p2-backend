@@ -398,4 +398,31 @@ describe('Deals routes', () => {
       });
     });
   });
+  describe('GET /api/stores/store_id/deals/:id', () => {
+    let createdDeal;
+    const dealData = {
+      products: [
+        {
+          id: productsFields[1].id,
+          amount: 10,
+        },
+      ],
+    };
+    beforeAll(async () => {
+      createdDeal = await request
+        .post(`/api/stores/${storeFields.id}/deals`)
+        .set('Content-type', 'application/json')
+        .send(dealData)
+        .auth(authCustomer.accessToken, { type: 'bearer' });
+    });
+    describe('only a logged-in user can retrive its information', () => {
+      test('user get information about deals', async () => {
+        const updateResponse = await request
+          .get(`/api/stores/${storeFields.id}/deals/${createdDeal.body.id}`)
+          .auth(authOwner.accessToken, { type: 'bearer' });
+        expect(updateResponse.status).toBe(200);
+        expect(updateResponse.type).toEqual('application/json');
+      });
+    });
+  });
 });
