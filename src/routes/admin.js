@@ -85,19 +85,34 @@ router.delete('users.remove', '/users/:userId', async (ctx) => {
       });
       await Promise.all(
         stores.map(async (store) => {
-          // Estos dos siguientes tienen problemas.
-          await ctx.orm.message.destroy({
-            where: { senderId: store.id },
+          const deals = await ctx.orm.deal.findAll({
+            where: { storeId: store.id },
           });
+          await Promise.all(
+            deals.map(async (deal) => {
+              await ctx.orm.message.destroy({
+                where: { dealId: deal.id },
+              });
+            }),
+          );
           await ctx.orm.deal.destroy({
             where: { storeId: store.id },
           });
-          // Estos dos anteriores tienen problemas.
           await ctx.orm.comment.destroy({
             where: { storeId: store.id },
           });
           await ctx.orm.product.destroy({
             where: { storeId: store.id },
+          });
+        }),
+      );
+      const dealsAsCustomer = await ctx.orm.deal.findAll({
+        where: { customerId: user.id },
+      });
+      await Promise.all(
+        dealsAsCustomer.map(async (deal) => {
+          await ctx.orm.message.destroy({
+            where: { dealId: deal.id },
           });
         }),
       );
@@ -167,11 +182,18 @@ router.delete('stores.remove', '/stores/:storeId', async (ctx) => {
     } else if (Object.is(store, null)) {
       ctx.throw(404, `Store with id ${ctx.params.storeId} could not be found`);
     } else {
-      await ctx.orm.comment.destroy({
+      const deals = await ctx.orm.deal.findAll({
         where: { storeId: store.id },
       });
-      await ctx.orm.message.destroy({
-        where: { senderId: store.id },
+      await Promise.all(
+        deals.map(async (deal) => {
+          await ctx.orm.message.destroy({
+            where: { dealId: deal.id },
+          });
+        }),
+      );
+      await ctx.orm.comment.destroy({
+        where: { storeId: store.id },
       });
       await ctx.orm.deal.destroy({
         where: { storeId: store.id },
