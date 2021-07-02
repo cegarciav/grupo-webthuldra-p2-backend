@@ -99,6 +99,15 @@ describe('Comments routes', () => {
     test('response with a json body type', async () => {
       expect(createResponse.type).toEqual('application/json');
     });
+    test('response body contains correct rewieverId', async () => {
+      expect(createResponse.body.reviewerId).toEqual(customerFields.id);
+    });
+    test('response body contains correct text', async () => {
+      expect(createResponse.body.text).toEqual(commentsFields.text);
+    });
+    test('response body contains correct storeId', async () => {
+      expect(createResponse.body.storeId).toEqual(storeFields.id);
+    });
   });
 
   describe('GET api/store/:store_id/comments', () => {
@@ -116,10 +125,10 @@ describe('Comments routes', () => {
     test('response with a json body type', async () => {
       expect(response.type).toEqual('application/json');
     });
-    test('response body contains at least one message', async () => {
+    test('response body contains at least one comment', async () => {
       expect(response.body.length).toBeGreaterThan(0);
     });
-    test('response body contains at least the message created directly to the db', async () => {
+    test('response body contains at least the comment created directly to the db', async () => {
       expect(theComment[0].text).toEqual(commentFields.text);
     });
   });
@@ -140,12 +149,15 @@ describe('Comments routes', () => {
       let updateResponse;
       beforeAll(async () => {
         updateResponse = await request
-          .delete(`/api/stores/${storeFields.id}/comments/${createResponse.body.id}`)
-          .send(createResponse.destroy())
+          .delete(`/api/stores/${storeFields.id}/comments/${commentFields.id}`)
           .auth(authCustomer.accessToken, { type: 'bearer' });
       });
       test('response with 204 status code', async () => {
         expect(updateResponse.status).toBe(204);
+      });
+      test('comment not anymore in db', async () => {
+        const availableComments = await app.context.orm.comment.findByPk(commentFields.id);
+        expect(availableComments).toBe(null);
       });
     });
   });
