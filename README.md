@@ -50,31 +50,28 @@ Responses:
 
     201: Deal agregado exitosamente
     Ejemplo: 
-    {
-    "data": {
-        "type": "deals",
-        "id": "2cac735e-4ef4-4d07-ab53-ac8deabe7391",
-        "attributes": {
-            "status": "abierto",
-            "customer-id": "d5536c9b-ee8a-4ff8-b25e-aaa8d327244b"
+        {
+        "data": {
+            "type": "deals",
+            "id": "2cac735e-4ef4-4d07-ab53-ac8deabe7391",
+            "attributes": {
+                "status": "abierto",
+                "customer-id": "d5536c9b-ee8a-4ff8-b25e-aaa8d327244b"
+                }
             }
         }
-    }
-
+  
 
     400: Informacion agregada erronea
     Ejemplo:
-    {
-        "status": 0,
-        "body": {
-            "errors": [
-            {
-                "type": "string",
-                "message": "string"
-            }
-            ]
-        }
-    }
+        
+        * Attribute products is mandatory and must have a length greater than 0
+        * Attribute products is not properly formed. Every product must contain a valid product id and amount
+        * Attribute products is not properly formed. Every product must be sold by the store
+        
+    403: Un usuario no puede crear un deal en su propia store.
+    Ejemplo:
+        You are not allowed to create a deal in your own store'
 
 ## Endpoints Secundarios: ##
 
@@ -135,7 +132,7 @@ Parametros:
 
 Body request: No aplica  
 
-    {}
+    no content
 
 Responses: 
 
@@ -244,7 +241,7 @@ Parametros:
 
 Body request: No aplica  
 
-    {}
+    no content
 
 Responses: 
 
@@ -272,7 +269,7 @@ Responses:
         ]
 
     200: Si no hay mensajes.
-    Ejemplo:
+    Ejemplo: Se retorna una lista vacia.
         []
 
 ### PATH: POST   /stores/{storeId}/comments ###
@@ -334,7 +331,7 @@ Responses:
 
     204: Se se elimina un comentario correctamente. 
     Ejemplo:
-        {}
+        no content
 
     403: El usuario que no sea dueño del comentario no puede eliminarlo.
     Ejemplo:
