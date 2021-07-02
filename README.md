@@ -78,7 +78,7 @@ Responses:
 
 ## Endpoints Secundarios: ##
 
-### PATH: PATCH   /stores/{storeId}/products/productId ###
+### PATH: PATCH   /stores/{storeId}/products/{productId} ###
 
 Descripcion: Se puede modificar un producto de una tienda. Solo se puede realizar por el dueño de la tienda.
 
@@ -119,8 +119,12 @@ Responses:
     403: Usuario no es dueño de la tienda. 
     Ejemplo: 
         You are not allowed to modify product with id ${product.id}
+    
+    404: Id del product o la store no existen.
+    Ejemplo:
+        no content
 
-### PATH: DELETE   /stores/{storeId}/products/productId ###
+### PATH: DELETE   /stores/{storeId}/products/{productId} ###
 
 Descripcion: Se puede eliminar un producto de una tienda. Solo se puede realizar por el dueño de la tienda.
 
@@ -143,7 +147,7 @@ Responses:
     Ejemplo:
         You are not allowed to remove product with id ${product.id}
     
-    400: El id del producto ingresado no existe.
+    404: El id del producto ingresado no existe.
     Ejemplo:
         Bad request
 
@@ -157,7 +161,7 @@ Parametros:
 
 Body request: No aplica  
 
-    {}
+    no content
 
 Responses: 
 
@@ -186,7 +190,7 @@ Responses:
 
     404: No hay mensajes.
     Ejemplo:
-        Message with id ${id} could not be found
+        no content
 
 ### PATH: POST   /deals/{dealId}/messages ###
 
@@ -216,7 +220,7 @@ Responses:
             "createdAt": "2021-07-01T22:20:19.498Z"
         }
 
-    403: El usuario no es dueño del deal.
+    403: El usuario no es parte del deal.
     Ejemplo:
         You are not allowed to send messages about deal with id ${deal.id}
 
@@ -261,9 +265,9 @@ Responses:
             }
         ]
 
-    404: No hay mensajes.
+    200: Si no hay mensajes.
     Ejemplo:
-        Comment with id ${id} could not be found
+        []
 
 ### PATH: POST   /stores/{storeId}/comments ###
 
@@ -307,7 +311,7 @@ Responses:
     Ejemplo:
         Bad request
 
-### PATH: DELETE   /stores/{storeId}/comments/commentId ###
+### PATH: DELETE   /stores/{storeId}/comments/{commentId} ###
 
 Descripcion: Se elimina un comentario en una tienda.
 
@@ -318,7 +322,7 @@ Parametros:
 
 Body request: No aplica
 
-    {}
+    no content
 
 Responses: 
 
@@ -335,7 +339,7 @@ Responses:
         Bad request
         
 
-### PATH: DELETE   /admin/users/userId ###
+### PATH: DELETE   /admin/users/{userId} ###
 
 Descripcion: El administrador puede eliminar un usuario.
 
@@ -345,23 +349,23 @@ Parametros:
 
 Body request: No aplica
 
-    {}
+    no content
 
 Responses: 
 
     204: Se se elimina un usuario correctamente. 
     Ejemplo:
-        {}
+        no content
 
     403: El usuario que no sea administrador no puede eliminar un usuario.
     Ejemplo:
         You are not allowed to remove user with id ${user.id}
     
-    400: El id ingresado no existe.
+    404: El id ingresado no existe.
     Ejemplo:
         Bad request
 
-### PATH: DELETE   /admin/store/storeId ###
+### PATH: DELETE   /admin/store/{storeId} ###
 
 Descripcion: El administrador puede eliminar una store.
 
@@ -371,23 +375,23 @@ Parametros:
 
 Body request: No aplica
 
-    {}
+    no content
 
 Responses: 
 
     204: Se se elimina una store correctamente. 
     Ejemplo:
-        {}
+        no content
 
     403: El usuario que no sea administrador no puede eliminar una store.
     Ejemplo:
         You are not allowed to remove store with id ${store.id}
     
-    400: El id ingresado no existe.
+    404: El id ingresado no existe.
     Ejemplo:
         Bad request
 
-### PATH: DELETE   /admin/comments/commentId ###
+### PATH: DELETE   /admin/comments/{commentId} ###
 
 Descripcion: El administrador puede eliminar un comentario.
 
@@ -397,13 +401,13 @@ Parametros:
 
 Body request: No aplica
 
-    {}
+    no content
 
 Responses: 
 
     204: Se se elimina un comentario correctamente. 
     Ejemplo:
-        {}
+        no content
 
     403: El usuario que no sea administrador no puede eliminar un comment.
     Ejemplo:
