@@ -62,7 +62,7 @@ Responses:
     }
 
 
-    400: Informacion para agregar erronea
+    400: Informacion agregada erronea
     Ejemplo:
     {
         "status": 0,
@@ -219,14 +219,20 @@ Responses:
             "updatedAt": "2021-07-01T22:20:19.498Z",
             "createdAt": "2021-07-01T22:20:19.498Z"
         }
+     
+    400: Informacion para crear un mensaje erronea.
+    Ejemplo:
+        Bad Request
 
     403: El usuario no es parte del deal.
     Ejemplo:
         You are not allowed to send messages about deal with id ${deal.id}
-
-    400: Informacion para crear un mensaje erronea.
+    
+    404: El id ingresado no existe.
     Ejemplo:
-        Bad Request
+        no content
+
+    
 
 ### PATH: GET   /stores/{storeId}/comments ###
 
@@ -332,7 +338,7 @@ Responses:
 
     403: El usuario que no sea dueño del comentario no puede eliminarlo.
     Ejemplo:
-        You are not allowed to remove comment with id ${comment.id}
+        You are not allowed to remove comment with id ${comment.id}.
     
     400: El id ingresado no existe.
     Ejemplo:
@@ -359,7 +365,7 @@ Responses:
 
     403: El usuario que no sea administrador no puede eliminar un usuario.
     Ejemplo:
-        You are not allowed to remove user with id ${user.id}
+        You are not allowed to remove user with id ${user.id}.
     
     404: El id ingresado no existe.
     Ejemplo:
@@ -385,7 +391,7 @@ Responses:
 
     403: El usuario que no sea administrador no puede eliminar una store.
     Ejemplo:
-        You are not allowed to remove store with id ${store.id}
+        You are not allowed to remove store with id ${store.id}.
     
     404: El id ingresado no existe.
     Ejemplo:
@@ -411,7 +417,7 @@ Responses:
 
     403: El usuario que no sea administrador no puede eliminar un comment.
     Ejemplo:
-        You are not allowed to remove comment with id ${comment.id}
+        You are not allowed to remove comment with id ${comment.id}.
     
     400: El id ingresado no existe.
     Ejemplo:
