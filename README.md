@@ -2,13 +2,13 @@
 
 ## Integrantes
 
-*  Ariadna Camino
-*  Carlos Olivos
-*  Camilo García
+* Ariadna Camino
+* Carlos Olivos
+* Camilo García
 
 ## Ayudante encargado
 
-*  Diego Solari
+* Diego Solari
 
 ## Link aplicación en Heroku
 https://webthuldra-api.herokuapp.com/
@@ -23,17 +23,16 @@ https://webthuldra-api.herokuapp.com/
 
 ## Documentacion:
 
-### Deal:
-
 ### PATH: POST   /stores/{storeId}/deals
 
 Descripcion: se puede agregar una promesa de compra.
 
-Parametros:  
+Parametros:
 
-    * storeId: Id de una tienda. 
+* storeId: Id de una tienda. 
 
 Body request:  
+
     {
         "products": [
             {
@@ -77,24 +76,25 @@ Responses:
         }
     }
 
-##Endpoints Secundarios: ##
+## Endpoints Secundarios: ##
 
-### PATH: PATCH   /stores/{storeId}/products/:id ### 
+### PATH: PATCH   /stores/{storeId}/products/productId ###
 
 Descripcion: Se puede modificar un producto de una tienda. Solo se puede realizar por el dueño de la tienda.
 
 Parametros:  
 
-    * storeId: Id de una tienda.
-    * id: Id de un producto
+* storeId: Id de una tienda.
+* productId: Id de un producto
 
 Body request: 
+
     {
-    "name": "nombre cambiado",
-    "stock": 100,
-    "price": 600,
-    "unit": "Kg",
-}
+      "name": "nombre cambiado",
+      "stock": 100,
+      "price": 600,
+      "unit": "Kg",
+    }
 
 Responses: 
 
@@ -120,14 +120,14 @@ Responses:
     Ejemplo: 
         You are not allowed to modify product with id ${product.id}
 
-### PATH: DELETE   /stores/{storeId}/products/:id ### 
+### PATH: DELETE   /stores/{storeId}/products/productId ###
 
 Descripcion: Se puede eliminar un producto de una tienda. Solo se puede realizar por el dueño de la tienda.
 
-Parametros:  
+Parametros:
 
-    * storeId: Id de una tienda.
-    * id: Id de un producto
+* storeId: Id de una tienda.
+* productId: Id de un producto
 
 Body request: No aplica  
 
@@ -147,14 +147,16 @@ Responses:
     Ejemplo:
         Bad request
 
-### PATH: GET   /deals/{dealId}/messages ### 
+### PATH: GET   /deals/{dealId}/messages ###
 
 Descripcion: Obtiene los mensajes de un deal.
 
-Parametros:  
-    * dealId: Id de un deal.
+Parametros:
+
+* dealId: Id de un deal.
 
 Body request: No aplica  
+
     {}
 
 Responses: 
@@ -186,17 +188,19 @@ Responses:
     Ejemplo:
         Message with id ${id} could not be found
 
-### PATH: POST   /deals/{dealId}/messages ### 
+### PATH: POST   /deals/{dealId}/messages ###
 
 Descripcion: Obtiene los mensajes de un deal.
 
 Parametros:  
-    * dealId: Id de un deal.
+
+* dealId: Id de un deal.
 
 Body request:  
-    {
-        "text": "me gustaron, buen servicio"
-    }
+
+      {
+          "text": "me gustaron, buen servicio"
+      }
 
 Responses: 
 
@@ -220,14 +224,16 @@ Responses:
     Ejemplo:
         Bad Request
 
-### PATH: GET   /stores/{storeId}/comments ### 
+### PATH: GET   /stores/{storeId}/comments ###
 
 Descripcion: Obtiene los comentarios de una tienda.
 
 Parametros:  
-    * storeId: Id de una store.
+
+* storeId: Id de una store.
 
 Body request: No aplica  
+
     {}
 
 Responses: 
@@ -259,14 +265,16 @@ Responses:
     Ejemplo:
         Comment with id ${id} could not be found
 
-### PATH: POST   /stores/{storeId}/comments ### 
+### PATH: POST   /stores/{storeId}/comments ###
 
 Descripcion: Se crea un comentario en una tienda.
 
-Parametros:  
-    * storeId: Id de una store.
+Parametros:
 
-Body request: grade es una puntuacion de 1 a 5.  
+* storeId: Id de una store.
+
+Body request: grade es una puntuacion de 1 a 5.
+
     {
         "text": "Comentario",
         "grade": 5
@@ -299,15 +307,17 @@ Responses:
     Ejemplo:
         Bad request
 
-### PATH: DELETE   /stores/{storeId}/comments/:id ### 
+### PATH: DELETE   /stores/{storeId}/comments/commentId ###
 
 Descripcion: Se elimina un comentario en una tienda.
 
-Parametros:  
-    * storeId: Id de una store.
-    * id: Id de un comment.
+Parametros:
 
-Body request: No aplica  
+* storeId: Id de una store.
+* commentId: Id de un comment.
+
+Body request: No aplica
+
     {}
 
 Responses: 
@@ -323,8 +333,85 @@ Responses:
     400: El id ingresado no existe.
     Ejemplo:
         Bad request
+        
 
+### PATH: DELETE   /admin/users/userId ###
 
+Descripcion: El administrador puede eliminar un usuario.
+
+Parametros:
+
+* userId: Id de un usuario.
+
+Body request: No aplica
+
+    {}
+
+Responses: 
+
+    204: Se se elimina un usuario correctamente. 
+    Ejemplo:
+        {}
+
+    403: El usuario que no sea administrador no puede eliminar un usuario.
+    Ejemplo:
+        You are not allowed to remove user with id ${user.id}
+    
+    400: El id ingresado no existe.
+    Ejemplo:
+        Bad request
+
+### PATH: DELETE   /admin/store/storeId ###
+
+Descripcion: El administrador puede eliminar una store.
+
+Parametros:
+
+* storeId: Id de una store.
+
+Body request: No aplica
+
+    {}
+
+Responses: 
+
+    204: Se se elimina una store correctamente. 
+    Ejemplo:
+        {}
+
+    403: El usuario que no sea administrador no puede eliminar una store.
+    Ejemplo:
+        You are not allowed to remove store with id ${store.id}
+    
+    400: El id ingresado no existe.
+    Ejemplo:
+        Bad request
+
+### PATH: DELETE   /admin/comments/commentId ###
+
+Descripcion: El administrador puede eliminar un comentario.
+
+Parametros:
+
+* commentId: Id de un comentario.
+
+Body request: No aplica
+
+    {}
+
+Responses: 
+
+    204: Se se elimina un comentario correctamente. 
+    Ejemplo:
+        {}
+
+    403: El usuario que no sea administrador no puede eliminar un comment.
+    Ejemplo:
+        You are not allowed to remove comment with id ${comment.id}
+    
+    400: El id ingresado no existe.
+    Ejemplo:
+        Bad request
 
 
 
