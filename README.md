@@ -75,3 +75,66 @@ Responses:
             ]
         }
     }
+
+Endpoints Secundarios: 
+
+PATH: PATCH   /stores/{storeId}/products/:id
+
+Descripcion: Se puede modificar un producto de una tienda. Solo se puede realizar por el dueño de la tienda.
+
+Parametros: 
+    -storeId: Id de una tienda.
+    -id: Id de un producto
+
+Body request: 
+    {
+    "name": "nombre cambiado",
+    "stock": 100,
+    "price": 600,
+    "unit": "Kg",
+}
+
+Responses: 
+
+    200: Modificacion realizada exitosamente
+    Ejemplo: 
+        {
+            "id": "b4810cc8-2ba5-43ac-86c3-5e46fe38e00b",
+            "name": "nombre cambiado",
+            "stock": 100,
+            "price": 600,
+            "unit": "Kg",
+            "storeId": "a0a5b325-9ac2-437c-8a71-a1573440d00a",
+            "createdAt": "2021-06-29T03:21:59.290Z",
+            "updatedAt": "2021-07-01T23:28:23.691Z"
+        }
+
+
+    400: Informacion para cambiar erronea
+    Ejemplo:
+        Bad Request
+
+    403: Usuario no es dueño de la tienda. 
+    Ejemplo: 
+        You are not allowed to modify product with id ${product.id}
+
+PATH: DELETE   /stores/{storeId}/products/:id
+
+Descripcion: Se puede eliminar un producto de una tienda. Solo se puede realizar por el dueño de la tienda.
+
+Parametros: 
+    -storeId: Id de una tienda.
+    -id: Id de un producto
+
+Body request: No aplica
+    {}
+
+Responses: 
+
+    204: El producto se elimina correctamente. 
+    Ejemplo:
+        No content
+
+    403: Usuario no es dueño de la tienda.
+    Ejemplo:
+        You are not allowed to remove product with id ${product.id}
