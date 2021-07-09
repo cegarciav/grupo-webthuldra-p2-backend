@@ -9,7 +9,7 @@ function generateJWT(user) {
     jwtGenerator.sign(
       { sub: user.id },
       process.env.JWT_SECRET,
-      { expiresIn: 86400 },
+      { expiresIn: 60 },
       (err, token) => (err ? reject(err) : resolve(token)),
     );
   });
@@ -23,7 +23,9 @@ router.post('auth.login', '/', async (ctx) => {
 
   try {
     const token = await generateJWT(user);
+    const toSendUser = { firstName: user.firstName, lastName: user.lastName, email };
     ctx.body = {
+      ...toSendUser,
       accessToken: token,
       tokenType: 'Bearer',
     };
