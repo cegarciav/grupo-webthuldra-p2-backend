@@ -1,33 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Stores routes GET /api/stores when a user is not logged-in, a 401 error is sent by the server response should match snapshot 1`] = `
-Object {
-  "errors": Array [
-    Object {
-      "message": "Authentication Error",
-      "type": "Unauthorised",
-    },
-  ],
-}
-`;
-
 exports[`Stores routes GET /api/stores/:id when passed, id does not correspond to any store response should match snapshot 1`] = `
 Object {
   "errors": Array [
     Object {
       "message": "Store with id f8a40537-85da-41f6-a5cc-6bf691965333 could not be found",
       "type": "Not Found",
-    },
-  ],
-}
-`;
-
-exports[`Stores routes GET /api/stores/:id when request is unauthorized because user is not logged-in response should match snapshot 1`] = `
-Object {
-  "errors": Array [
-    Object {
-      "message": "Authentication Error",
-      "type": "Unauthorised",
     },
   ],
 }
