@@ -94,27 +94,12 @@ describe('Stores routes', () => {
         expect(response.body[0].address).toEqual(storeFields.address);
       });
     });
-
-    describe('when a user is not logged-in, a 401 error is sent by the server', () => {
-      let response;
-      beforeAll(async () => {
-        response = await request
-          .get(`/api/stores?address=${storeFields.address}`);
-      });
-      test('unauthorized get request to endpoint', async () => {
-        expect(response.status).toBe(401);
-      });
-      test('response should match snapshot', async () => {
-        expect(response.body).toMatchSnapshot();
-      });
-    });
   });
 
   describe('GET /api/stores/:id', () => {
     const authorizedGetStore = (id) => request
       .get(`/api/stores/${id}`)
       .auth(authOwner.accessToken, { type: 'bearer' });
-    const unauthorizedGetStore = (id) => request.get(`/api/stores/${id}`);
 
     describe('when passed, id corresponds to an existing store', () => {
       let response;
@@ -148,19 +133,6 @@ describe('Stores routes', () => {
       });
       test('responds with 404 status code', async () => {
         expect(response.status).toBe(404);
-      });
-      test('response should match snapshot', async () => {
-        expect(response.body).toMatchSnapshot();
-      });
-    });
-
-    describe('when request is unauthorized because user is not logged-in', () => {
-      let response;
-      beforeAll(async () => {
-        response = await unauthorizedGetStore(store.id);
-      });
-      test('responds with 401 status code', async () => {
-        expect(response.status).toBe(401);
       });
       test('response should match snapshot', async () => {
         expect(response.body).toMatchSnapshot();

@@ -1,9 +1,11 @@
+require('dotenv').config();
 const path = require('path');
 const Koa = require('koa');
 const koaBody = require('koa-body');
 const koaLogger = require('koa-logger');
 const koaFlashMessage = require('koa-flash-message').default;
 const koaStatic = require('koa-static');
+const koaCors = require('@koa/cors');
 const render = require('koa-ejs');
 const session = require('koa-session');
 const override = require('koa-override-method');
@@ -16,6 +18,11 @@ const orm = require('./models');
 
 // App constructor
 const app = new Koa();
+
+// Setup CORS
+app.use(koaCors({
+  origin: process.env.FRONTEND_ORIGIN,
+}));
 
 const developmentMode = app.env === 'development';
 const testMode = app.env === 'test';

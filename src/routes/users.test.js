@@ -110,7 +110,6 @@ describe('Users routes', () => {
     const authorizedGetUser = () => request
       .get('/api/users')
       .auth(auth.accessToken, { type: 'bearer' });
-    const unauthorizedGetUser = () => request.get('/api/users');
 
     describe('when a user is logged-in, a list of users is retrieved', () => {
       let response;
@@ -128,20 +127,12 @@ describe('Users routes', () => {
         expect(filteredData.length).toEqual(1);
       });
     });
-
-    describe('when a user is not logged-in, a 401 error is sent by the server', () => {
-      test('unauthorized get request to endpoint', async () => {
-        const response = await unauthorizedGetUser(loggedOutUser.id);
-        expect(response.status).toBe(401);
-      });
-    });
   });
 
   describe('GET /api/users/me', () => {
     const authorizedGetUser = () => request
       .get('/api/users/me')
       .auth(auth.accessToken, { type: 'bearer' });
-    const unauthorizedGetUser = () => request.get('/api/users/me');
 
     describe('only a logged-in user can retrive its information', () => {
       let response;
@@ -164,20 +155,12 @@ describe('Users routes', () => {
         expect(response.body.password).toEqual(undefined);
       });
     });
-
-    describe('when request is unauthorized because user is not logged in', () => {
-      test('unauthorized get request to endpoint', async () => {
-        const response = await unauthorizedGetUser(loggedOutUser.id);
-        expect(response.status).toBe(401);
-      });
-    });
   });
 
   describe('GET /api/users/:id', () => {
     const authorizedGetUser = (id) => request
       .get(`/api/users/${id}`)
       .auth(auth.accessToken, { type: 'bearer' });
-    const unauthorizedGetUser = (id) => request.get(`/api/users/${id}`);
 
     describe('when passed, id corresponds to an existing user', () => {
       let response;
@@ -205,13 +188,6 @@ describe('Users routes', () => {
       test('responds with 404 status code', async () => {
         const response = await authorizedGetUser(uuid());
         expect(response.status).toBe(404);
-      });
-    });
-
-    describe('when request is unauthorized because user is not logged in', () => {
-      test('unauthorized get request to endpoint', async () => {
-        const response = await unauthorizedGetUser(loggedOutUser.id);
-        expect(response.status).toBe(401);
       });
     });
   });
