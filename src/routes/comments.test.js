@@ -149,4 +149,49 @@ describe('Comments routes', () => {
       });
     });
   });
+
+  describe('GET /api/users/me/comments', () => {
+    const authorizedGetUserComments = () => request
+      .get('/api/users/me/comments')
+      .auth(authCustomer.accessToken, { type: 'bearer' });
+    const unauthorizedGetUserComments = () => request.get('/api/users/me/comments');
+    let createResponse;
+    const commentData = {
+      text: 'Prueba',
+      grade: 5,
+    };
+
+    beforeAll(async () => {
+      await app.context.orm.comment.destroy({ where: { reviewerId: customerFields.id } });
+      createResponse = await request
+        .post(`/api/stores/${storeFields.id}/comments`)
+        .set('Content-type', 'application/json')
+        .send(commentData)
+        .auth(authCustomer.accessToken, { type: 'bearer' });
+    });
+
+    describe('only a logged-in user can retrive its comments information', () => {
+      let response;
+      beforeAll(async () => {
+        response = await authorizedGetUserComments(authCustomer.id);
+      });
+      test('response with 200 status code', async () => {
+        expect(response.status).toBe(200);
+      });
+      test('response with a json body type', async () => {
+        expect(response.type).toEqual('application/json');
+      });
+      test('response body contains the comment created', async () => {
+        expect(response.body.length).toEqual(1);
+        expect(response.body[0].id).toEqual(createResponse.body.id);
+      });
+    });
+
+    describe('request is unauthorized when user is not logged in', () => {
+      test('unauthorized get request to endpoint', async () => {
+        const response = await unauthorizedGetUserComments();
+        expect(response.status).toBe(401);
+      });
+    });
+  });
 });
