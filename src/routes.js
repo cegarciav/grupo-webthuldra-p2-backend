@@ -67,7 +67,7 @@ router.use(async (ctx, next) => {
 router.use('/', index.routes());
 router.use('/auth', auth.routes());
 router.use('/users', users.routes());
-router.use(jwtKoa({ secret: process.env.JWT_SECRET, key: 'authData' }));
+router.use(jwtKoa({ secret: process.env.JWT_SECRET, key: 'authData' }).unless({ method: 'GET' }));
 router.use(setCurrentUser);
 
 /* Protected routes */
