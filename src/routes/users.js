@@ -75,6 +75,26 @@ router.get('users.me.deals', '/me/deals', async (ctx) => {
   ctx.body = deals;
 });
 
+router.get('users.me.comments', '/me/comments', async (ctx) => {
+  const { currentUser } = ctx.state;
+  const comments = await ctx.orm.comment.findAll({
+    where: {
+      reviewerId: currentUser.id,
+    },
+    include: [
+      {
+        association: 'store',
+        attributes: ['name', 'address'],
+      },
+      {
+        association: 'reviewer',
+        attributes: ['firstName', 'lastName', 'email'],
+      },
+    ],
+  });
+  ctx.body = comments;
+});
+
 router.get('users.show', '/:id', async (ctx) => {
   const { user } = ctx.state;
   ctx.body = {
