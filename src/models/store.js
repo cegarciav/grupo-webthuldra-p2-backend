@@ -51,6 +51,12 @@ module.exports = (sequelize, DataTypes) => {
         isUUID: 4,
       },
     },
+    picture: {
+      type: DataTypes.STRING,
+      validate: {
+        isUrl: true,
+      },
+    },
   }, {
     sequelize,
     modelName: 'store',

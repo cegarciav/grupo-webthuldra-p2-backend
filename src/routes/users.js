@@ -1,5 +1,6 @@
 const KoaRouter = require('koa-router');
 const { uuid } = require('uuidv4');
+const { Op } = require('sequelize');
 const jwtKoa = require('koa-jwt');
 const { setCurrentUser } = require('../middlewares/auth');
 
@@ -57,14 +58,24 @@ router.get('users.me', '/me', async (ctx) => {
 
 router.get('users.me.deals', '/me/deals', async (ctx) => {
   const { currentUser } = ctx.state;
+  const storeIds = (await ctx.orm.store.findAll({
+    where: { ownerId: currentUser.id },
+  })).map((store) => store.id);
   const deals = await ctx.orm.deal.findAll({
     where: {
-      customerId: currentUser.id,
+      [Op.or]: [
+        { customerId: currentUser.id },
+        { storeId: storeIds },
+      ],
     },
     include: [
       {
         association: 'customer',
         attributes: ['firstName', 'lastName', 'email', 'id'],
+      },
+      {
+        association: 'store',
+        attributes: ['name', 'id'],
       },
       {
         association: 'products',

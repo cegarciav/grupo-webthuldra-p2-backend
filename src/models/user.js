@@ -60,6 +60,12 @@ module.exports = (sequelize, DataTypes) => {
         notEmpty: true,
       },
     },
+    picture: {
+      type: DataTypes.STRING,
+      validate: {
+        isUrl: true,
+      },
+    },
   }, {
     sequelize,
     modelName: 'user',
