@@ -11,8 +11,9 @@ router.post('stores.create', '/', async (ctx) => {
       ...ctx.request.body,
       ownerId: currentUser.id,
       id: uuid(),
+      picture: ctx.request.body.picture || null,
     });
-    await store.save({ field: ['id', 'address', 'name', 'description', 'ownerId'] });
+    await store.save({ field: ['id', 'address', 'name', 'description', 'ownerId', 'picture'] });
     ctx.status = 201;
     ctx.body = store;
   } catch (e) {
