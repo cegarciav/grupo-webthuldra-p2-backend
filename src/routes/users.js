@@ -11,6 +11,7 @@ router.post('users.create', '/', async (ctx) => {
     const user = ctx.orm.user.build({
       ...ctx.request.body,
       id: uuid(),
+      picture: ctx.request.body.picture || null,
     });
     await user.save();
     ctx.status = 201;
@@ -19,6 +20,7 @@ router.post('users.create', '/', async (ctx) => {
       lastName: user.lastName,
       email: user.email,
       id: user.id,
+      picture: user.picture,
     };
   } catch (e) {
     if (e.name && e.name.includes('Sequelize')) {
