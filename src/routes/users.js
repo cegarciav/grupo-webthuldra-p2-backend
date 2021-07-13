@@ -52,6 +52,7 @@ router.get('users.me', '/me', async (ctx) => {
     firstName: currentUser.firstName,
     lastName: currentUser.lastName,
     email: currentUser.email,
+    picture: currentUser.picture,
     id: currentUser.id,
   };
 });
@@ -127,9 +128,11 @@ router.patch('users.update', '/:id', async (ctx) => {
         ctx.throw(401, 'You need to send your current password to modify your profile');
       }
       const { newPassword } = ctx.request.body;
+      const picture = ctx.request.body.picture || null;
       const modifications = {
         ...ctx.request.body,
         password: newPassword || user.password,
+        picture,
       };
       await ctx.orm.user.update(modifications, {
         where: { id: user.id },
