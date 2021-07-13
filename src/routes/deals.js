@@ -183,15 +183,15 @@ router.get('deals.show', '/:id', async (ctx) => {
     include: [
       {
         association: 'customer',
-        attributes: ['firstName', 'lastName', 'email', 'id'],
+        attributes: ['firstName', 'lastName', 'email', 'id', 'picture'],
       },
       {
         association: 'products',
-        attributes: ['name', 'price', 'unit'],
+        attributes: ['name', 'price', 'unit', 'picture'],
       },
       {
         model: ctx.orm.store,
-        attributes: ['id', 'name'],
+        attributes: ['id', 'name', 'picture'],
       },
     ],
   });
