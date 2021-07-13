@@ -19,8 +19,9 @@ router.post('products.create', '/', getStore, async (ctx) => {
         ...ctx.request.body,
         id: uuid(),
         storeId: store.id,
+        picture: ctx.request.body.picture || null,
       });
-      await product.save({ field: ['id', 'name', 'stock', 'price', 'unit', 'storeId'] });
+      await product.save({ field: ['id', 'name', 'stock', 'price', 'unit', 'storeId', 'picture'] });
       ctx.status = 201;
       ctx.body = product;
     }
@@ -67,7 +68,9 @@ router.patch('products.update', '/:id', getStore, async (ctx) => {
     if (store.ownerId !== currentUser.id) {
       ctx.throw(403, `You are not allowed to modify product with id ${product.id}`);
     } else {
-      const modifications = {};
+      const modifications = {
+        picture: ctx.request.body.picture || null,
+      };
       Object.keys(ctx.request.body)
         .filter((param) => ['name', 'stock', 'price', 'unit'].includes(param) && ctx.request.body[param])
         .forEach((param) => { modifications[param] = ctx.request.body[param]; });

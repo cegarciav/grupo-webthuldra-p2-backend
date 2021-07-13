@@ -73,7 +73,10 @@ router.patch('stores.update', '/:id', async (ctx) => {
     if (store.ownerId !== currentUser.id) {
       ctx.throw(403, `You are not allowed to modify store with id ${store.id}`);
     } else {
-      const modifications = {};
+      const modifications = {
+        picture: ctx.request.body.picture || null,
+        description: ctx.request.body.description || '',
+      };
       Object.keys(ctx.request.body)
         .filter((param) => ['address', 'name', 'description'].includes(param) && ctx.request.body[param])
         .forEach((param) => { modifications[param] = ctx.request.body[param]; });
