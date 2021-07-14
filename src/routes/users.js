@@ -50,12 +50,16 @@ router.get('users.list', '/', async (ctx) => {
 
 router.get('users.me', '/me', async (ctx) => {
   const { currentUser } = ctx.state;
+  const admin = await ctx.orm.administrator.findAll({
+    where: { userId: currentUser.id },
+  });
   ctx.body = {
     firstName: currentUser.firstName,
     lastName: currentUser.lastName,
     email: currentUser.email,
     picture: currentUser.picture,
     id: currentUser.id,
+    isAdmin: admin.length > 0,
   };
 });
 
